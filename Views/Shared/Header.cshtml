@@ -1,0 +1,17 @@
+@{
+    var siteName = ViewData["SiteName"] as string ?? "Opti Blog";
+}
+<header class="site-header">
+    <div class="container site-header__inner">
+        <a class="site-header__logo" href="/">@siteName</a>
+        <nav class="site-header__nav" aria-label="Primary">
+            <ul role="list">
+                <li><a href="/">Home</a></li>
+                <li><a href="/en/blog-list">Blog</a></li>
+                <li><a href="/blog/author/jane-doe">Authors</a></li>
+                <li><a href="/search">Search</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+

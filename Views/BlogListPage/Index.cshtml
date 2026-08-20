@@ -1,0 +1,80 @@
+@model BlogListViewModel
+@inject UrlResolver UrlResolver
+
+<div class="container">
+    <h1>@Model.Blog.Heading</h1>
+
+    @if (Model.Blog.Intro is not null)
+    {
+        <div class="blog-intro">
+            @Html.PropertyFor(model => model.Blog.Intro)
+        </div>
+    }
+
+    @if (Model.Blog.MainContentArea is not null)
+    {
+        <div class="blog-list__main-content">
+            @Html.PropertyFor(model => model.Blog.MainContentArea)
+        </div>
+    }
+
+    <p class="blog-landing__count" aria-live="polite">
+        @Model.TotalPosts post@(Model.TotalPosts == 1 ? string.Empty : "s") found
+    </p>
+
+    @if (Model.Posts.Count == 0)
+    {
+        <p class="blog-landing__empty">No published blog posts are available yet.</p>
+    }
+    else
+    {
+        <ul class="content-area" id="post-list" data-component="teaser-list" role="list">
+            @foreach (var post in Model.Posts)
+            {
+                <li class="content-item content-item--card">
+                    <article class="teaser teaser--card">
+                        @if (!ContentReference.IsNullOrEmpty(post.HeroImage))
+                        {
+                            <img class="teaser__media" src="@UrlResolver.GetUrl(post.HeroImage)" alt="" />
+                        }
+                        else
+                        {
+                            <div class="teaser__media teaser__media--placeholder" aria-hidden="true">Hero image</div>
+                        }
+                        <div class="teaser__card-body">
+                            @if (post.Tags?.FirstOrDefault() is { Length: > 0 } primaryTag)
+                            {
+                                <span class="teaser__badge">@primaryTag</span>
+                            }
+                            <h3 class="teaser__title">
+                                <a href="@Url.ContentUrl(post.ContentLink)">@post.Title</a>
+                            </h3>
+                            <p class="teaser__meta">
+                                <span class="teaser__date">@post.PublishDate?.ToString("MMM d, yyyy")</span>
+                                <span class="teaser__reading-time">@post.MainBody.EstimateReadingTime() min</span>
+                            </p>
+                            <a class="teaser__author" href="/blog/author/jane-doe">@post.Author</a>
+                        </div>
+                    </article>
+                </li>
+            }
+        </ul>
+    }
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="pagination" aria-label="Pagination">
+            @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+            {
+                if (pageNumber == Model.CurrentPageNumber)
+                {
+                    <span class="pagination__page is-current" aria-current="page">@pageNumber</span>
+                }
+                else
+                {
+                    <a class="pagination__page" href="?page=@pageNumber">@pageNumber</a>
+                }
+            }
+        </nav>
+    }
+</div>

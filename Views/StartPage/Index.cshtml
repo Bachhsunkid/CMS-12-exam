@@ -1,0 +1,10 @@
+@model StartPage
+
+<div class="container">
+    <h1>Test start page</h1>
+
+    @if (Model.MainContentArea is not null)
+    {
+        @Html.PropertyFor(model => model.MainContentArea)
+    }
+</div>
