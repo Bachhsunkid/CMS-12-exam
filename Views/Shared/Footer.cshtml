@@ -1,0 +1,15 @@
+@using EPiServer.Framework.Localization
+@using EPiServer.Shell.Web.Mvc.Html
+@{
+    var siteName = ViewData["SiteName"] as string ?? "Opti Blog";
+}
+<footer class="site-footer">
+    <div class="container site-footer__inner">
+        <p>&copy; @DateTime.UtcNow.Year @siteName. All rights reserved.</p>
+        <ul class="site-footer__links" role="list">
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/blog/author/jane-doe">Authors</a></li>
+            <li><a href="/search">Search</a></li>
+        </ul>
+    </div>
+</footer>
