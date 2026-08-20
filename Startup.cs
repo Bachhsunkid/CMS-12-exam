@@ -1,8 +1,8 @@
 using EPiServer.Cms.Shell;
 using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.Scheduler;
-using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
+using TrainingTest.Business.Blog;
 
 namespace TrainingTest;
 
@@ -29,6 +29,8 @@ public class Startup
             .AddCms()
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
+        
+        services.AddScoped<IBlogPostQueryService, BlogPostQueryService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -1,0 +1,32 @@
+@model BlogTeaserBlock
+@inject IContentLoader ContentLoader
+@inject UrlResolver UrlResolver
+
+@if (Model.Post is { } postReference
+    && !ContentReference.IsNullOrEmpty(postReference)
+    && ContentLoader.TryGet<BlogPostPage>(postReference, out var post))
+{
+    <article class="teaser teaser--default">
+        @if (!ContentReference.IsNullOrEmpty(post.HeroImage))
+        {
+            <img class="teaser__media" src="@UrlResolver.GetUrl(post.HeroImage)" alt="" />
+        }
+        else
+        {
+            <div class="teaser__media teaser__media--placeholder" aria-hidden="true">Hero image</div>
+        }
+        <div class="teaser__body">
+            @if (!string.IsNullOrWhiteSpace(Model.Kicker))
+            {
+                <p class="teaser__kicker">@Model.Kicker</p>
+            }
+            <h3 class="teaser__title"><a href="@Url.ContentUrl(post.ContentLink)">@post.Title</a></h3>
+            <p class="teaser__summary">@post.Summary</p>
+            <p class="teaser__meta">
+                <a class="teaser__author" href="/blog/author/jane-doe">@post.Author</a>
+                <span class="teaser__date">@post.PublishDate?.ToString("MMM d, yyyy")</span>
+                <span class="teaser__reading-time">@post.MainBody.EstimateReadingTime() min read</span>
+            </p>
+        </div>
+    </article>
+}
