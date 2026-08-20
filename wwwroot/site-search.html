@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search | Opti Blog</title>
+    <script type="module" crossorigin src="/site-search.js"></script>
+    <link rel="stylesheet" crossorigin href="/site-search.css">
+  </head>
+  <body>
+    <div class="page-layout">
+      <!-- Shared site header (Task 4b: rendered when a page inherits or overrides the default header). -->
+<!-- Nav hrefs point at the generated static files; BE swaps these for real routes on integration. -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__logo" href="/index.html">Opti Blog</a>
+    <nav class="site-header__nav" aria-label="Primary">
+      <ul role="list">
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/blog-landing-page.html">Blog</a></li>
+        <li><a href="/blog/author/jane-doe">Authors</a></li>
+        <li><a href="/site-search.html">Search</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+      <!-- Task 7b: site-wide search across pages, blog posts and uploaded documents in a single mixed result list. -->
+      <main class="page-main">
+        <div class="container">
+          <h1>Search</h1>
+
+          <div class="search-box">
+            <input type="search" class="search-box__input" id="search-input" placeholder="Search the whole site…" aria-label="Search the whole site">
+          </div>
+
+          <div class="site-search__type-filter" role="group" aria-label="Filter by content type">
+            <button type="button" class="type-filter__option is-selected" data-type="all">All</button>
+            <button type="button" class="type-filter__option" data-type="page">Pages</button>
+            <button type="button" class="type-filter__option" data-type="blog-post">Blog posts</button>
+            <button type="button" class="type-filter__option" data-type="document">Documents</button>
+          </div>
+
+          <p id="results-count" class="blog-landing__count" aria-live="polite"></p>
+
+          <!-- Server: render one <li class="search-result"> per mixed result, each with a title, excerpt and link. -->
+          <ul class="search-result-list" id="result-list" data-component="result-list" role="list">
+            <li class="search-result">
+              <span class="search-result__type">Blog post</span>
+              <h3 class="search-result__title"><a href="/blog-post-page.html?slug=example-post">Example Post Title</a></h3>
+              <p class="search-result__excerpt">Example excerpt text for this result.</p>
+            </li>
+          </ul>
+
+          <div id="pagination-container"></div>
+        </div>
+      </main>
+
+      <!-- Shared site footer (Task 4b: rendered when a page inherits or overrides the default footer). -->
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <p>&copy; 2026 Opti Blog. All rights reserved.</p>
+    <ul class="site-footer__links" role="list">
+      <li><a href="/blog-landing-page.html">Blog</a></li>
+      <li><a href="/blog/author/jane-doe">Authors</a></li>
+      <li><a href="/site-search.html">Search</a></li>
+    </ul>
+  </div>
+</footer>
+
+    </div>
+
+  </body>
+</html>

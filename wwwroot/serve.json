@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/blog/author/:slug/page-:page", "destination": "/author.html" },
+    { "source": "/blog/author/:slug", "destination": "/author.html" }
+  ]
+}

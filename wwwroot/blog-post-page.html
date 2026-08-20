@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Example Post Title | Opti Blog</title>
+    <script type="module" crossorigin src="/blog-post-page.js"></script>
+    <link rel="stylesheet" crossorigin href="/blog-post-page.css">
+  </head>
+  <body>
+    <div class="page-layout">
+      <!-- Shared site header (Task 4b: rendered when a page inherits or overrides the default header). -->
+<!-- Nav hrefs point at the generated static files; BE swaps these for real routes on integration. -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__logo" href="/index.html">Opti Blog</a>
+    <nav class="site-header__nav" aria-label="Primary">
+      <ul role="list">
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/blog-landing-page.html">Blog</a></li>
+        <li><a href="/blog/author/jane-doe">Authors</a></li>
+        <li><a href="/site-search.html">Search</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+      <main class="page-main">
+        <article class="container blog-post">
+          <div class="blog-post__hero teaser__media--placeholder" aria-hidden="true">Hero image</div>
+
+          <header class="blog-post__header">
+            <h1>Example Post Title</h1>
+            <p class="blog-post__meta">
+              <a class="teaser__author" href="/blog/author/jane-doe">Jane Doe</a>
+              <span class="blog-post__date">Jan 1, 2026</span>
+              <span class="blog-post__reading-time" id="reading-time">4 min read</span>
+            </p>
+            <ul class="blog-post__tags" role="list">
+              <li class="blog-post__tag">optimizely</li>
+              <li class="blog-post__tag">cms</li>
+            </ul>
+          </header>
+
+          <!--
+            BlogPostPage.MainBody — sample rich text exercising the 4 TinyMCE custom styles from Task 2.
+            InternalNotes is editorial-only and must never be rendered on the page.
+          -->
+          <div class="blog-post__body">
+            <p class="lead">
+              A short introduction paragraph using the "Lead Paragraph" style, giving readers a quick overview
+              before the full article begins.
+            </p>
+
+            <p>
+              This is a normal paragraph of body copy. It contains a
+              <a class="btn btn-primary" href="/blog-landing-page.html">Primary Button</a>
+              styled link, used for the main call to action, and a
+              <a class="btn btn-secondary" href="/site-search.html">Secondary Button</a>
+              styled link for a less prominent action.
+            </p>
+
+            <blockquote class="pull-quote">
+              "Great content platforms get out of the editor's way." — this is the "Pull Quote" style, applied to a
+              block quote.
+            </blockquote>
+
+            <p>
+              The rest of the article continues here with more regular paragraphs, headings and inline formatting,
+              exactly as authored in the CMS rich-text editor.
+            </p>
+          </div>
+
+          <section class="blog-post__related" aria-label="Related posts">
+            <h2>Related posts</h2>
+            <!-- RelatedPosts content area: demonstrates full-width, half-width and card display options (Task 3). -->
+            <ul class="content-area" role="list">
+              <li class="content-item content-item--full">
+                <article class="teaser teaser--default">
+                  <div class="teaser__media teaser__media--placeholder" aria-hidden="true">Hero image</div>
+                  <div class="teaser__body">
+                    <p class="teaser__kicker">dotnet</p>
+                    <h3 class="teaser__title"><a href="/blog-post-page.html?slug=full-width-example">Full-width Related Post</a></h3>
+                    <p class="teaser__summary">Shown at full width — spans the entire content area.</p>
+                    <p class="teaser__meta">
+                      <a class="teaser__author" href="/blog/author/john-smith">John Smith</a>
+                      <span class="teaser__date">Dec 20, 2025</span>
+                      <span class="teaser__reading-time">3 min read</span>
+                    </p>
+                  </div>
+                </article>
+              </li>
+              <li class="content-item content-item--half">
+                <article class="teaser teaser--default">
+                  <div class="teaser__media teaser__media--placeholder" aria-hidden="true">Hero image</div>
+                  <div class="teaser__body">
+                    <p class="teaser__kicker">search</p>
+                    <h3 class="teaser__title"><a href="/blog-post-page.html?slug=half-width-example">Half-width Related Post</a></h3>
+                    <p class="teaser__summary">Shown at half width, sharing a row with another item.</p>
+                    <p class="teaser__meta">
+                      <a class="teaser__author" href="/blog/author/maria-garcia">Maria Garcia</a>
+                      <span class="teaser__date">Dec 15, 2025</span>
+                      <span class="teaser__reading-time">2 min read</span>
+                    </p>
+                  </div>
+                </article>
+              </li>
+              <li class="content-item content-item--card">
+                <article class="teaser teaser--card">
+                  <div class="teaser__media teaser__media--placeholder" aria-hidden="true">Hero image</div>
+                  <div class="teaser__card-body">
+                    <span class="teaser__badge">azure</span>
+                    <h3 class="teaser__title"><a href="/blog-post-page.html?slug=card-example">Card Related Post</a></h3>
+                    <p class="teaser__meta">
+                      <span class="teaser__date">Dec 10, 2025</span>
+                      <span class="teaser__reading-time">5 min</span>
+                    </p>
+                    <a class="teaser__author" href="/blog/author/jane-doe">Jane Doe</a>
+                  </div>
+                </article>
+              </li>
+            </ul>
+          </section>
+
+          <button type="button" class="btn btn-secondary blog-post__copy-link" id="copy-link-button">Copy link</button>
+        </article>
+      </main>
+
+      <!-- Shared site footer (Task 4b: rendered when a page inherits or overrides the default footer). -->
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <p>&copy; 2026 Opti Blog. All rights reserved.</p>
+    <ul class="site-footer__links" role="list">
+      <li><a href="/blog-landing-page.html">Blog</a></li>
+      <li><a href="/blog/author/jane-doe">Authors</a></li>
+      <li><a href="/site-search.html">Search</a></li>
+    </ul>
+  </div>
+</footer>
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jane Doe | Opti Blog</title>
+    <script type="module" crossorigin src="/author.js"></script>
+    <link rel="stylesheet" crossorigin href="/author.css">
+  </head>
+  <body>
+    <div class="page-layout">
+      <!-- Shared site header (Task 4b: rendered when a page inherits or overrides the default header). -->
+<!-- Nav hrefs point at the generated static files; BE swaps these for real routes on integration. -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__logo" href="/index.html">Opti Blog</a>
+    <nav class="site-header__nav" aria-label="Primary">
+      <ul role="list">
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/blog-landing-page.html">Blog</a></li>
+        <li><a href="/blog/author/jane-doe">Authors</a></li>
+        <li><a href="/site-search.html">Search</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+      <!--
+        Task 8: BE resolves /blog/author/{slug} (and /blog/author/{slug}/page-{n}) to this template,
+        looking up the AuthorProfileBlock by its Slug property. Unrecognized slugs render not-found.html instead.
+      -->
+      <main class="page-main">
+        <div class="container">
+          <header class="author-profile__header">
+            <div class="author-profile__avatar teaser__media--placeholder" id="author-avatar" aria-hidden="true">JD</div>
+            <div>
+              <h1 id="author-name">Jane Doe</h1>
+              <p class="author-profile__bio" id="author-bio">
+                Jane is a solutions architect focused on content platforms and developer experience.
+              </p>
+            </div>
+          </header>
+
+          <h2 class="author-profile__posts-heading">Posts by this author</h2>
+
+          <!-- Server: render one <li class="content-item content-item--full"> per post by this author, newest first. -->
+          <ul class="content-area" id="post-list" data-component="teaser-list" role="list">
+            <li class="content-item content-item--full">
+              <article class="teaser teaser--default">
+                <div class="teaser__media teaser__media--placeholder" aria-hidden="true">Hero image</div>
+                <div class="teaser__body">
+                  <p class="teaser__kicker">optimizely</p>
+                  <h3 class="teaser__title"><a href="/blog-post-page.html?slug=example-post">Example Post Title</a></h3>
+                  <p class="teaser__summary">Example summary text for this author's post.</p>
+                  <p class="teaser__meta">
+                    <span class="teaser__date">Jan 1, 2026</span>
+                    <span class="teaser__reading-time">4 min read</span>
+                  </p>
+                </div>
+              </article>
+            </li>
+          </ul>
+
+          <div id="pagination-container"></div>
+        </div>
+      </main>
+
+      <!-- Shared site footer (Task 4b: rendered when a page inherits or overrides the default footer). -->
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <p>&copy; 2026 Opti Blog. All rights reserved.</p>
+    <ul class="site-footer__links" role="list">
+      <li><a href="/blog-landing-page.html">Blog</a></li>
+      <li><a href="/blog/author/jane-doe">Authors</a></li>
+      <li><a href="/site-search.html">Search</a></li>
+    </ul>
+  </div>
+</footer>
+
+    </div>
+
+  </body>
+</html>
