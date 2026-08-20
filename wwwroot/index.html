@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opti Blog</title>
+    <link rel="stylesheet" crossorigin href="/index.css">
+  </head>
+  <body>
+    <div class="page-layout">
+      <!-- Shared site header (Task 4b: rendered when a page inherits or overrides the default header). -->
+<!-- Nav hrefs point at the generated static files; BE swaps these for real routes on integration. -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__logo" href="/index.html">Opti Blog</a>
+    <nav class="site-header__nav" aria-label="Primary">
+      <ul role="list">
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/blog-landing-page.html">Blog</a></li>
+        <li><a href="/blog/author/jane-doe">Authors</a></li>
+        <li><a href="/site-search.html">Search</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+      <!-- Dev/preview hub linking every generated page — not a CMS content type, for local navigation only. -->
+      <main class="page-main">
+        <div class="container">
+          <h1>Opti Blog — page index</h1>
+          <p class="index-intro">Links to every generated page, for local preview and BE integration reference.</p>
+
+          <ul class="index-list" role="list">
+            <li class="index-list__item">
+              <a href="/blog-landing-page.html">Blog landing page</a>
+              <p>Search, tag &amp; date facets, sort, quick-reads filter, paged teaser grid.</p>
+            </li>
+            <li class="index-list__item">
+              <a href="/blog-post-page.html">Blog post detail</a>
+              <p>Hero, meta, tags, rich-text styles demo, related posts (full/half/card layouts).</p>
+            </li>
+            <li class="index-list__item">
+              <a href="/blog/author/jane-doe">Author profile</a>
+              <p>Author bio and their posts. Try <code>/blog/author/john-smith</code> or <code>/blog/author/maria-garcia</code>.</p>
+            </li>
+            <li class="index-list__item">
+              <a href="/site-search.html">Site-wide search</a>
+              <p>Mixed results across pages, blog posts and documents, with a type filter.</p>
+            </li>
+            <li class="index-list__item">
+              <a href="/not-found.html">404 / not-found</a>
+              <p>Served for unrecognized authors and other missing content.</p>
+            </li>
+          </ul>
+        </div>
+      </main>
+
+      <!-- Shared site footer (Task 4b: rendered when a page inherits or overrides the default footer). -->
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <p>&copy; 2026 Opti Blog. All rights reserved.</p>
+    <ul class="site-footer__links" role="list">
+      <li><a href="/blog-landing-page.html">Blog</a></li>
+      <li><a href="/blog/author/jane-doe">Authors</a></li>
+      <li><a href="/site-search.html">Search</a></li>
+    </ul>
+  </div>
+</footer>
+
+    </div>
+  </body>
+</html>

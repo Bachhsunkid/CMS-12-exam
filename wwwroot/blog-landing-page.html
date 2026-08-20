@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog | Opti Blog</title>
+    <script type="module" crossorigin src="/blog-landing-page.js"></script>
+    <link rel="stylesheet" crossorigin href="/blog-landing-page.css">
+  </head>
+  <body>
+    <div class="page-layout">
+      <!-- Shared site header (Task 4b: rendered when a page inherits or overrides the default header). -->
+<!-- Nav hrefs point at the generated static files; BE swaps these for real routes on integration. -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__logo" href="/index.html">Opti Blog</a>
+    <nav class="site-header__nav" aria-label="Primary">
+      <ul role="list">
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/blog-landing-page.html">Blog</a></li>
+        <li><a href="/blog/author/jane-doe">Authors</a></li>
+        <li><a href="/site-search.html">Search</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+      <main class="page-main">
+        <div class="container">
+          <h1>Blog</h1>
+
+          <!-- BlogListPage.Intro: reduced editor (emphasis, link, undo/redo only) — plain rich text, no custom styles. -->
+          <div class="blog-intro">
+            <p>
+              Notes on <strong>content platforms</strong>, <em>search</em> and shipping software, from the whole team.
+              Read the <a href="/about.html">about page</a> to learn more.
+            </p>
+          </div>
+
+          <div class="blog-landing__layout">
+            <aside class="blog-landing__facets" aria-label="Filter posts">
+              <div id="facet-tag" data-component="facet-tag"></div>
+              <div id="facet-period" data-component="facet-period"></div>
+              <label class="search-box__toggle">
+                <input type="checkbox" id="quick-reads-toggle">
+                Quick reads only (under 3 min)
+              </label>
+            </aside>
+
+            <div class="blog-landing__results">
+              <div class="search-box">
+                <input type="search" class="search-box__input" id="search-input" placeholder="Search posts by title, summary or body…" aria-label="Search blog posts">
+                <select class="search-box__sort" id="sort-select" aria-label="Sort order">
+                  <option value="relevance">Sort: relevance</option>
+                  <option value="newest">Sort: newest</option>
+                </select>
+              </div>
+
+              <p id="results-count" class="blog-landing__count" aria-live="polite"></p>
+
+              <!--
+                Server: render one <li class="content-item content-item--card"> per BlogTeaserBlock, newest first,
+                paged by BlogListPage.PageSize. The example below shows the exact markup for one item;
+                blog-landing-page.ts re-renders this same markup from mock data for the interactive demo.
+              -->
+              <ul class="content-area" id="post-list" data-component="teaser-list" role="list">
+                <li class="content-item content-item--card">
+                  <article class="teaser teaser--card">
+                    <div class="teaser__media teaser__media--placeholder" aria-hidden="true">Hero image</div>
+                    <div class="teaser__card-body">
+                      <span class="teaser__badge">optimizely</span>
+                      <h3 class="teaser__title"><a href="/blog-post-page.html?slug=example-post">Example Post Title</a></h3>
+                      <p class="teaser__meta">
+                        <span class="teaser__date">Jan 1, 2026</span>
+                        <span class="teaser__reading-time">4 min</span>
+                      </p>
+                      <a class="teaser__author" href="/blog/author/jane-doe">Jane Doe</a>
+                    </div>
+                  </article>
+                </li>
+              </ul>
+
+              <div id="pagination-container"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Shared site footer (Task 4b: rendered when a page inherits or overrides the default footer). -->
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <p>&copy; 2026 Opti Blog. All rights reserved.</p>
+    <ul class="site-footer__links" role="list">
+      <li><a href="/blog-landing-page.html">Blog</a></li>
+      <li><a href="/blog/author/jane-doe">Authors</a></li>
+      <li><a href="/site-search.html">Search</a></li>
+    </ul>
+  </div>
+</footer>
+
+    </div>
+
+  </body>
+</html>
