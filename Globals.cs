@@ -46,4 +46,12 @@ public class Globals
         [Display(Name = "Editorial", Order = 120)]
         public const string Editorial = "Editorial";
     }
+    
+    public static class Layouts
+    {
+        public const string FullWidth = "full";
+        public const string HalfWidth = "half";
+        public const string Card = "card";
+        
+    }
 }

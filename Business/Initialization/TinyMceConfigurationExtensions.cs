@@ -5,9 +5,8 @@ namespace TrainingTest.Business.Initialization;
 
 public static class TinyMceConfigurationExtensions
 {
-    public static IServiceCollection AddTinyMceConfiguration(this IServiceCollection services)
+    public static IServiceCollection AddBlogTinyMceConfiguration(this IServiceCollection services)
     {
-        // reference: https://docs.developers.optimizely.com/content-management-system/docs/tinymce-editor
         services.Configure<TinyMceConfiguration>(configuration =>
         {
             configuration.For<BlogPostPage>(page => page.MainBody)

@@ -31,7 +31,12 @@ public class Startup
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
         
-        services.AddTinyMceConfiguration();
+        // reference: https://docs.developers.optimizely.com/content-management-system/docs/display-options
+        services.AddBlogDisplayOptions();
+        
+        // reference: https://docs.developers.optimizely.com/content-management-system/docs/configuration-api
+        services.AddBlogTinyMceConfiguration();
+
         services.AddScoped<IBlogPostQueryService, BlogPostQueryService>();
     }
 
