@@ -3,6 +3,7 @@ using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.Scheduler;
 using EPiServer.Web.Routing;
 using TrainingTest.Business.Blog;
+using TrainingTest.Business.Initialization;
 
 namespace TrainingTest;
 
@@ -30,6 +31,7 @@ public class Startup
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
         
+        services.AddTinyMceConfiguration();
         services.AddScoped<IBlogPostQueryService, BlogPostQueryService>();
     }
 
