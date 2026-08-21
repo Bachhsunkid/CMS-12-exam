@@ -4,6 +4,7 @@ using EPiServer.Scheduler;
 using EPiServer.Web.Routing;
 using TrainingTest.Business.Blog;
 using TrainingTest.Business.Initialization;
+using TrainingTest.Business.Resolvers;
 
 namespace TrainingTest;
 
@@ -31,13 +32,14 @@ public class Startup
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
         
-        // reference: https://docs.developers.optimizely.com/content-management-system/docs/display-options
         services.AddBlogDisplayOptions();
-        
-        // reference: https://docs.developers.optimizely.com/content-management-system/docs/configuration-api
         services.AddBlogTinyMceConfiguration();
 
+        services.AddMemoryCache();
         services.AddScoped<IBlogPostQueryService, BlogPostQueryService>();
+
+        services.AddSingleton<ISiteSettingsResolver, SiteSettingsResolver>();
+        services.AddSingleton<IPageLayoutResolver, PageLayoutResolver>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

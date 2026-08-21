@@ -8,6 +8,7 @@ public class StartPageController : PageControllerBase<StartPage>
     public IActionResult Index(StartPage currentPage)
     {
         ViewData["PageCss"] = "/index.css";
+        SetPageLayout(currentPage);
         return View(currentPage);
     }
 }

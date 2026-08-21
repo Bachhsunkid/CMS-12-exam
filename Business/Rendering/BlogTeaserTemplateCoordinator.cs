@@ -5,7 +5,7 @@ using TrainingTest.Models.Blocks;
 namespace TrainingTest.Business.Rendering;
 
 [ServiceConfiguration(typeof(IViewTemplateModelRegistrator))]
-public sealed class BlogTeaserTemplateCoordinator : IViewTemplateModelRegistrator
+public class BlogTeaserTemplateCoordinator : IViewTemplateModelRegistrator
 {
     public void Register(TemplateModelCollection templates)
     {

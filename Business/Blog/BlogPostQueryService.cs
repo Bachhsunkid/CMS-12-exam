@@ -8,6 +8,8 @@ public class BlogPostQueryService(IContentLoader contentLoader) : IBlogPostQuery
 {
     public BlogListViewModel GetPosts(BlogListPage blog, int requestedPage)
     {
+        // Builds the visitor-facing, paginated list of posts below a BlogListPage.
+        // Reference: https://docs.developers.optimizely.com/content-management-system/docs/icontentrepository-and-datafactory
         var pageSize = Math.Clamp(blog.PageSize ?? Constants.DefaultPageSize, 1, 50);
         var visitorFilter = new FilterContentForVisitor();
 

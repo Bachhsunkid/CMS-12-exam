@@ -11,6 +11,7 @@ public class BlogPostPageController(UrlResolver urlResolver) : PageControllerBas
     public IActionResult Index(BlogPostPage currentPage)
     {
         ViewData["PageCss"] = "/blog-post-page.css";
+        SetPageLayout(currentPage);
         
         return View(new BlogPostViewModel
         {

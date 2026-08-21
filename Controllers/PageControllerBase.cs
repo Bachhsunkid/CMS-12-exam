@@ -3,6 +3,7 @@ using EPiServer.Shell.Security;
 using EPiServer.Web.Mvc;
 using EPiServer.Web.Routing;
 using Microsoft.AspNetCore.Mvc;
+using TrainingTest.Business.Resolvers;
 using TrainingTest.Models.Pages;
 
 namespace TrainingTest.Controllers;
@@ -15,6 +16,12 @@ public abstract class PageControllerBase<T> : PageController<T>
     where T : SitePageData
 {
     protected readonly Injected<UISignInManager> UISignInManager;
+    protected readonly Injected<IPageLayoutResolver> PageLayoutResolver;
+
+    protected void SetPageLayout(SitePageData page)
+    {
+        ViewData["PageLayout"] = PageLayoutResolver.Service.Resolve(page);
+    }
 
     /// <summary>
     /// Signs out the current user and redirects to the Index action of the same controller.

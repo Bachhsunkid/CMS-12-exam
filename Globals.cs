@@ -34,6 +34,9 @@ public class Globals
         [Display(Name = "SiteSettings", Order = 80)]
         public const string SiteSettings = "SiteSettings";
 
+        [Display(Name = "Header and footer", Order = 85)]
+        public const string HeaderAndFooter = "HeaderAndFooter";
+
         [Display(Name = "Specialized", Order = 90)]
         public const string Specialized = "Specialized";
         
@@ -52,6 +55,5 @@ public class Globals
         public const string FullWidth = "full";
         public const string HalfWidth = "half";
         public const string Card = "card";
-        
     }
 }

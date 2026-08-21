@@ -8,7 +8,7 @@ namespace TrainingTest.Models.Pages;
     GUID = "e19a2195-9d66-43c1-a956-0c6425cfe386",
     GroupName = Globals.GroupNames.Specialized,
     Order = 1)]
-[AvailableContentTypes(Include = [typeof(BlogListPage)])]
+[AvailableContentTypes(Include = [typeof(BlogListPage), typeof(SiteSettingsPage)])]
 public class StartPage : SitePageData
 {
     [Display(Name = "Main content area", 

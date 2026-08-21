@@ -10,7 +10,7 @@ public class BlogListPageController(IBlogPostQueryService blogPostQueryService)
     public IActionResult Index(BlogListPage currentPage, int page = 1)
     {
         ViewData["PageCss"] = "/blog-landing-page.css";
-        
+        SetPageLayout(currentPage);
         return View(blogPostQueryService.GetPosts(currentPage, page));
     }
 }

@@ -7,6 +7,8 @@ public static class TinyMceConfigurationExtensions
 {
     public static IServiceCollection AddBlogTinyMceConfiguration(this IServiceCollection services)
     {
+        // Defines the writing tools and asset-matching styles available for blog body and intro fields.
+        // Reference: https://docs.developers.optimizely.com/content-management-system/docs/configuration-api
         services.Configure<TinyMceConfiguration>(configuration =>
         {
             configuration.For<BlogPostPage>(page => page.MainBody)

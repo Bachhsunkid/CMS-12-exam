@@ -1,15 +1,13 @@
-@using EPiServer.Framework.Localization
-@using EPiServer.Shell.Web.Mvc.Html
-@{
-    var siteName = ViewData["SiteName"] as string ?? "Opti Blog";
-}
+@model TrainingTest.Models.Blocks.FooterBlock
+
 <footer class="site-footer">
     <div class="container site-footer__inner">
-        <p>&copy; @DateTime.UtcNow.Year @siteName. All rights reserved.</p>
+        <p>@Model.CopyrightText</p>
         <ul class="site-footer__links" role="list">
-            <li><a href="/blog">Blog</a></li>
-            <li><a href="/blog/author/jane-doe">Authors</a></li>
-            <li><a href="/search">Search</a></li>
+            @foreach (var link in Model.Links ?? [])
+            {
+                <li>@Html.ContentLink(link)</li>
+            }
         </ul>
     </div>
 </footer>

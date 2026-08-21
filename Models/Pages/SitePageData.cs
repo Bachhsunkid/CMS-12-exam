@@ -1,5 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using EPiServer.Shell.ObjectEditing;
 using EPiServer.Web;
+using TrainingTest.Business.Selection;
+using TrainingTest.Models.Blocks;
 
 namespace TrainingTest.Models.Pages;
 
@@ -27,4 +30,28 @@ public class SitePageData : PageData
         Order = 300)]
     [UIHint(UIHint.Textarea)] // multi-row text editor
     public virtual string? MetaDescription { get; set; }
+
+    [Display(Name = "Header behavior",
+        GroupName = Globals.GroupNames.HeaderAndFooter,
+        Order = 10)]
+    [SelectOne(SelectionFactoryType = typeof(HeaderFooterBehaviorSelectionFactory))]
+    public virtual int HeaderBehavior { get; set; }
+
+    [AllowedTypes(typeof(HeaderBlock))]
+    [Display(Name = "Header override",
+        GroupName = Globals.GroupNames.HeaderAndFooter,
+        Order = 20)]
+    public virtual ContentReference? HeaderOverride { get; set; }
+
+    [Display(Name = "Footer behavior",
+        GroupName = Globals.GroupNames.HeaderAndFooter,
+        Order = 30)]
+    [SelectOne(SelectionFactoryType = typeof(HeaderFooterBehaviorSelectionFactory))]
+    public virtual int FooterBehavior { get; set; }
+
+    [AllowedTypes(typeof(FooterBlock))]
+    [Display(Name = "Footer override",
+        GroupName = Globals.GroupNames.HeaderAndFooter,
+        Order = 40)]
+    public virtual ContentReference? FooterOverride { get; set; }
 }
