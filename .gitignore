@@ -5,6 +5,8 @@
 
 # dotenv files
 .env
+appsettings.Development.json
+modules/_protected/Find/
 
 # User-specific files
 *.rsuser

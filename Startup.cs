@@ -32,6 +32,7 @@ public class Startup
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
         
+        services.AddFind();
         services.AddBlogDisplayOptions();
         services.AddBlogTinyMceConfiguration();
 
