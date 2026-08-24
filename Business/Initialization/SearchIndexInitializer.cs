@@ -29,7 +29,7 @@ public class SearchIndexInitializer : IInitializableModule
         // Computed fields stay outside the CMS model but are available to Task 7 queries and filters.
         client.Conventions.ForInstancesOf<BlogPostPage>()
             .IncludeField(post => post.GetReadingTimeMinutes())
-            .IncludeField(post => post.MainBody)
+            .IncludeField(post => post.GetSearchableMainBody())
             .IncludeField(post => post.GetAgeInDays())
             .ExcludeField(post => post.InternalNotes);
 

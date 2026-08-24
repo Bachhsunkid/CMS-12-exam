@@ -12,6 +12,13 @@ public static class SearchIndexFieldHelper
         return Math.Max(1, post.MainBody.EstimateReadingTime());
     }
 
+    public static string GetSearchableMainBody(this BlogPostPage post)
+    {
+        // Find indexes extension-method return values registered with IncludeField more reliably
+        // when the expression starts from the indexed BlogPostPage instance.
+        return post.MainBody.StripHtml();
+    }
+
     public static int GetAgeInDays(this BlogPostPage post)
     {
         // Uses the same local CMS time convention as publishing and seed data.
@@ -21,5 +28,16 @@ public static class SearchIndexFieldHelper
         }
 
         return Math.Max(0, (int)Math.Floor((DateTime.Now - post.PublishDate.Value).TotalDays));
+    }
+    
+    private static string StripHtml(this XhtmlString? xhtmlString)
+    {
+        if (xhtmlString is null || xhtmlString.IsEmpty)
+        {
+            return string.Empty;
+        }
+
+        var textWithoutTags = Regex.Replace(xhtmlString.ToHtmlString(), "<[^>]+>", " ");
+        return Regex.Replace(WebUtility.HtmlDecode(textWithoutTags), @"\s+", " ").Trim();
     }
 }

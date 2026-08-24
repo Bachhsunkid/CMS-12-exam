@@ -5,6 +5,7 @@ using EPiServer.Web.Routing;
 using TrainingTest.Business.Blog;
 using TrainingTest.Business.Initialization;
 using TrainingTest.Business.Resolvers;
+using TrainingTest.Business.Search;
 
 namespace TrainingTest;
 
@@ -37,7 +38,8 @@ public class Startup
         services.AddBlogTinyMceConfiguration();
 
         services.AddMemoryCache();
-        services.AddScoped<IBlogPostQueryService, BlogPostQueryService>();
+
+        services.AddScoped<IBlogSearchService, BlogSearchService>();
         services.AddSingleton<IBlogSeedDataProvider, BlogSeedDataProvider>();
         services.AddSingleton<ISiteSettingsResolver, SiteSettingsResolver>();
         services.AddSingleton<IPageLayoutResolver, PageLayoutResolver>();

@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using EPiServer.Find.Json;
 using EPiServer.SpecializedProperties;
 using EPiServer.Web;
 
@@ -31,7 +30,7 @@ public class BlogPostPage : SitePageData
         Order = 20)]
     public virtual string? Summary { get; set; }
 
-    [RemoveHtmlTagsWhenIndexing]
+    // [RemoveHtmlTagsWhenIndexing] - use GetSearchableMainBody instead
     [CultureSpecific]
     [Display(Name = "Main body", 
         GroupName = Globals.GroupNames.Content, 

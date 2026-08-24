@@ -1,16 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
-using TrainingTest.Business.Blog;
+using TrainingTest.Business.Models;
+using TrainingTest.Business.Search;
 using TrainingTest.Models.Pages;
 
 namespace TrainingTest.Controllers;
 
-public class BlogListPageController(IBlogPostQueryService blogPostQueryService)
+public class BlogListPageController(IBlogSearchService blogSearchService)
     : PageControllerBase<BlogListPage>
 {
-    public IActionResult Index(BlogListPage currentPage, int page = 1)
+    public async Task<IActionResult> Index(BlogListPage currentPage)
     {
         ViewData["PageCss"] = "/blog-landing-page.css";
         SetPageLayout(currentPage);
-        return View(blogPostQueryService.GetPosts(currentPage, page));
+        var searchResult = await blogSearchService.SearchAsync(currentPage, BlogSearchRequest.Parse(Request.Query));
+        return View(searchResult);
     }
 }
