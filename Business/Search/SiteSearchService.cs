@@ -27,7 +27,7 @@ public class SiteSearchService(IClient client, UrlResolver urlResolver) : ISiteS
     {
         ITypeSearch<ISearchContent> search = string.IsNullOrWhiteSpace(request.Query)
             ? client.UnifiedSearch()
-            : client.UnifiedSearch().For(request.Query);
+            : client.UnifiedSearchFor(request.Query).ApplyBestBets();
 
         search = ApplyTypeFilter(search, request.Type);
 

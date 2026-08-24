@@ -103,7 +103,10 @@ public class BlogSearchService(IClient client) : IBlogSearchService
                 .InFields(
                     post => post.Title,
                     post => post.Summary,
-                    post => post.GetSearchableMainBody());
+                    post => post.GetSearchableMainBody())
+                .BoostMatching(post => post.GetAgeInDays().LessThan(91), 1000)
+                .BoostMatching(post => post.Tags.Match("optimizely"), 2000)
+                .ApplyBestBets();
         }
         
         // Find requires For(...) before any filter. These CMS filters then keep every Blog List
