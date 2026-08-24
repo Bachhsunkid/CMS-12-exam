@@ -30,7 +30,7 @@ public class BlogSearchService(IClient client) : IBlogSearchService
         }
 
         var selectedPostsTask = selectedPostsSearch
-            .Skip((request.Page - 1) * pageSize)
+            .Skip(PaginationHelper.GetSkip(request.Page, pageSize))
             .Take(pageSize)
             .GetContentResultAsync();
 
@@ -53,13 +53,13 @@ public class BlogSearchService(IClient client) : IBlogSearchService
         var tagFacetSearchResult = await tagFacetTask;
         var periodFacetSearchResult = await periodFacetTask;
 
-        var totalPages = Math.Max(1, (int)Math.Ceiling(selectedPostsResult.TotalMatching / (double)pageSize));
-        var currentPage = request.Page <= totalPages ? request.Page : 1;
+        var totalPages = PaginationHelper.GetTotalPages(selectedPostsResult.TotalMatching, pageSize);
+        var currentPage = PaginationHelper.NormalizePage(request.Page, totalPages);
 
         if (currentPage != request.Page)
         {
             selectedPostsResult = await ApplySelectedFilters(blogSearchClient, blog, request, includeTag: true, includePeriod: true)
-                .Skip(0)
+                .Skip(PaginationHelper.GetSkip(currentPage, pageSize))
                 .Take(pageSize)
                 .GetContentResultAsync();
         }

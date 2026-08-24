@@ -40,6 +40,7 @@ public class Startup
         services.AddMemoryCache();
 
         services.AddScoped<IBlogSearchService, BlogSearchService>();
+        services.AddScoped<ISiteSearchService, SiteSearchService>();
         services.AddSingleton<IBlogSeedDataProvider, BlogSeedDataProvider>();
         services.AddSingleton<ISiteSettingsResolver, SiteSettingsResolver>();
         services.AddSingleton<IPageLayoutResolver, PageLayoutResolver>();
