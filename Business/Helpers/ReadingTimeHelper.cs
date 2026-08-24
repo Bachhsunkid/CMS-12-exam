@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
 
-namespace TrainingTest.Business.Blog;
+namespace TrainingTest.Business.Helpers;
 
-public static class ReadingTimeExtensions
+public static class ReadingTimeHelper
 {
     private const int WordsPerMinute = 200;
 

@@ -37,7 +37,7 @@ public class Startup
 
         services.AddMemoryCache();
         services.AddScoped<IBlogPostQueryService, BlogPostQueryService>();
-
+        services.AddSingleton<IBlogSeedDataProvider, BlogSeedDataProvider>();
         services.AddSingleton<ISiteSettingsResolver, SiteSettingsResolver>();
         services.AddSingleton<IPageLayoutResolver, PageLayoutResolver>();
     }

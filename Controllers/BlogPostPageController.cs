@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using EPiServer.Web.Routing;
-using TrainingTest.Business.Blog;
+using TrainingTest.Business.Helpers;
 using TrainingTest.Models.Pages;
 using TrainingTest.Models.ViewModels;
 
