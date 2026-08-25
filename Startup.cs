@@ -1,8 +1,10 @@
 using EPiServer.Cms.Shell;
 using EPiServer.Cms.UI.AspNetIdentity;
+using EPiServer.Core.Routing;
 using EPiServer.Scheduler;
 using EPiServer.Web.Routing;
 using TrainingTest.Business.Blog;
+using TrainingTest.Business.Authoring;
 using TrainingTest.Business.Initialization;
 using TrainingTest.Business.Resolvers;
 using TrainingTest.Business.Search;
@@ -41,6 +43,8 @@ public class Startup
 
         services.AddScoped<IBlogSearchService, BlogSearchService>();
         services.AddScoped<ISiteSearchService, SiteSearchService>();
+        services.AddScoped<IAuthorService, AuthorService>();
+        services.AddSingleton<IPartialRouter, AuthorPartialRouter>();
         services.AddSingleton<IBlogSeedDataProvider, BlogSeedDataProvider>();
         services.AddSingleton<ISiteSettingsResolver, SiteSettingsResolver>();
         services.AddSingleton<IPageLayoutResolver, PageLayoutResolver>();

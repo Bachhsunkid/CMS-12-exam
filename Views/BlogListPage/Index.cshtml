@@ -114,8 +114,9 @@
             else
             {
                 <ul class="content-area" id="post-list" data-component="teaser-list" role="list">
-                    @foreach (var post in Model.Posts)
+                    @foreach (var item in Model.Posts)
                     {
+                        var post = item.Post;
                         <li class="content-item content-item--card">
                             <article class="teaser teaser--card">
                                 @if (!ContentReference.IsNullOrEmpty(post.HeroImage))
@@ -145,7 +146,14 @@
                                         <span class="teaser__date">@post.PublishDate?.ToString("MMM d, yyyy")</span>
                                         <span class="teaser__reading-time">@post.MainBody.EstimateReadingTime() min</span>
                                     </p>
-                                    <a class="teaser__author" href="/blog/author/jane-doe">@post.Author</a>
+                                    @if (!string.IsNullOrWhiteSpace(item.AuthorUrl))
+                                    {
+                                        <a class="teaser__author" href="@item.AuthorUrl">@post.Author</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="teaser__author">@post.Author</span>
+                                    }
                                 </div>
                             </article>
                         </li>

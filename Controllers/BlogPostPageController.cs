@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using EPiServer.Web.Routing;
 using TrainingTest.Business.Helpers;
+using TrainingTest.Business.Authoring;
 using TrainingTest.Models.Pages;
 using TrainingTest.Models.ViewModels;
 
 namespace TrainingTest.Controllers;
 
-public class BlogPostPageController(UrlResolver urlResolver) : PageControllerBase<BlogPostPage>
+public class BlogPostPageController(UrlResolver urlResolver, IAuthorService authorService) : PageControllerBase<BlogPostPage>
 {
     public IActionResult Index(BlogPostPage currentPage)
     {
@@ -20,7 +21,7 @@ public class BlogPostPageController(UrlResolver urlResolver) : PageControllerBas
             HeroImageUrl = ContentReference.IsNullOrEmpty(currentPage.HeroImage)
                 ? null
                 : urlResolver.GetUrl(currentPage.HeroImage),
-            AuthorUrl = "/blog/author/jane-doe"
+            AuthorUrl = authorService.GetUrl(currentPage)
         });
     }
 }

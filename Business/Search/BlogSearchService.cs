@@ -3,6 +3,7 @@ using EPiServer.Find.Cms;
 using TrainingTest.Business.Helpers;
 using TrainingTest.Business.Models;
 using TrainingTest.Business.Models.Enums;
+using TrainingTest.Business.Authoring;
 using TrainingTest.Models.Pages;
 using TrainingTest.Models.ViewModels;
 
@@ -14,7 +15,7 @@ namespace TrainingTest.Business.Search;
 /// https://docs.developers.optimizely.com/content-management-system/v1.1.0-search-and-navigation/docs/facets
 /// and https://docs.developers.optimizely.com/content-management-system/v1.1.0-search-and-navigation/docs/pagination-skip-and-take
 /// </summary>
-public class BlogSearchService(IClient client) : IBlogSearchService
+public class BlogSearchService(IClient client, IAuthorService authorService) : IBlogSearchService
 {
     public async Task<BlogSearchViewModel> SearchAsync(BlogListPage blog, BlogSearchRequest request)
     {
@@ -68,7 +69,13 @@ public class BlogSearchService(IClient client) : IBlogSearchService
         {
             Blog = blog,
             Request = request,
-            Posts = selectedPostsResult.Items.ToList(),
+            Posts = selectedPostsResult.Items
+                .Select(post => new BlogPostListItemViewModel
+                {
+                    Post = post,
+                    AuthorUrl = authorService.GetUrl(blog, post.Author)
+                })
+                .ToList(),
             TagFacets = tagFacetSearchResult
                 .TermsFacetFor(post => post.Tags)
                 .Terms
