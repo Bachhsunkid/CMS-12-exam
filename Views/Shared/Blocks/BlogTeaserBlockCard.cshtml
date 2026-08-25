@@ -1,0 +1,40 @@
+@model BlogTeaserBlock
+@inject IContentLoader ContentLoader
+@inject UrlResolver UrlResolver
+@inject TrainingTest.Business.Authoring.IAuthorService AuthorService
+
+@if (Model.Post is { } postReference
+     && !ContentReference.IsNullOrEmpty(postReference)
+     && ContentLoader.TryGet<BlogPostPage>(postReference, out var post))
+{
+    var authorUrl = AuthorService.GetUrl(post);
+    <article class="teaser teaser--card">
+        @if (!ContentReference.IsNullOrEmpty(post.HeroImage))
+        {
+            <img class="teaser__media" src="@UrlResolver.GetUrl(post.HeroImage)" alt="" />
+        }
+        else
+        {
+            <div class="teaser__media teaser__media--placeholder" aria-hidden="true">Hero image</div>
+        }
+        <div class="teaser__card-body">
+            @if (post.Tags?.FirstOrDefault() is { Length: > 0 } primaryTag)
+            {
+                <span class="teaser__badge">@primaryTag</span>
+            }
+            <h3 class="teaser__title"><a href="@Url.ContentUrl(post.ContentLink)">@post.Title</a></h3>
+            <p class="teaser__meta">
+                <span class="teaser__date">@post.PublishDate?.ToString("MMM d, yyyy")</span>
+                <span class="teaser__reading-time">@post.MainBody.EstimateReadingTime() min</span>
+            </p>
+            @if (!string.IsNullOrWhiteSpace(authorUrl))
+            {
+                <a class="teaser__author" href="@authorUrl">@post.Author</a>
+            }
+            else
+            {
+                <span class="teaser__author">@post.Author</span>
+            }
+        </div>
+    </article>
+}

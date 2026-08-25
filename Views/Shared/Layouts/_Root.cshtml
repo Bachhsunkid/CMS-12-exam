@@ -1,0 +1,45 @@
+@using TrainingTest.Business.Resolvers
+@{
+    var pageTitle = ViewData["Title"] as string ?? "Opti Blog";
+    var pageCss = ViewData["PageCss"] as string;
+    var pageScript = ViewData["PageScript"] as string;
+    var pageLayout = ViewData["PageLayout"] as PageLayoutModel;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@pageTitle</title>
+    @if (!string.IsNullOrWhiteSpace(pageCss))
+    {
+        <link rel="stylesheet" crossorigin href="@pageCss"/>
+    }
+</head>
+<body>
+
+@* @await Html.RenderEPiServerQuickNavigatorAsync() *@
+
+<div class="page-layout">
+    @if (pageLayout?.Header is not null)
+    {
+        <partial name="Header" model="pageLayout.Header"/>
+    }
+    <main class="page-main">
+        @RenderBody()
+    </main>
+    @if (pageLayout?.Footer is not null)
+    {
+        <partial name="Footer" model="pageLayout.Footer"/>
+    }
+</div>
+
+@if (!string.IsNullOrWhiteSpace(pageScript))
+{
+    <script type="module" crossorigin src="@pageScript"></script>
+}
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

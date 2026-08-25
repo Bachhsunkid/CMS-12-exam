@@ -1,0 +1,56 @@
+@model BlogPostViewModel
+@inject BlogContentAreaItemRenderer ContentAreaItemRenderer
+
+<article class="container blog-post">
+    @if (!string.IsNullOrWhiteSpace(Model.HeroImageUrl))
+    {
+        <img class="blog-post__hero" src="@Model.HeroImageUrl" alt=""/>
+    }
+    else
+    {
+        <div class="blog-post__hero teaser__media--placeholder" aria-hidden="true">Hero image</div>
+    }
+
+    <header class="blog-post__header">
+        <h1>@Model.BlogPost.Title</h1>
+        <p class="blog-post__meta">
+            <a class="teaser__author" href="@Model.AuthorUrl">@Model.BlogPost.Author</a>
+            <span class="blog-post__date">@Model.BlogPost.PublishDate?.ToString("MMM d, yyyy")</span>
+            <span class="blog-post__reading-time">@Model.ReadingTimeMinutes min read</span>
+        </p>
+
+        @if (Model.BlogPost.Tags?.Count > 0)
+        {
+            <ul class="blog-post__tags" role="list">
+                @foreach (var tag in Model.BlogPost.Tags)
+                {
+                    <li class="blog-post__tag">@tag</li>
+                }
+            </ul>
+        }
+    </header>
+
+    @if (Model.BlogPost.MainBody is not null)
+    {
+        <div class="blog-post__body">
+            @Html.PropertyFor(model => model.BlogPost.MainBody)
+        </div>
+    }
+
+    @if (Model.BlogPost.RelatedPosts is not null)
+    {
+        <section class="blog-post__related" aria-label="Related posts">
+            <h2>Related posts</h2>
+            <ul epi-property="@Model.BlogPost.RelatedPosts" class="content-area" role="list">
+                <li epi-property-item class="content-item" epi-on-item-rendered="OnRelatedPostItemRendered"></li>
+            </ul>
+        </section>
+    }
+</article>
+
+@functions {
+    public void OnRelatedPostItemRendered(ContentAreaItem contentAreaItem, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput output)
+    {
+        ContentAreaItemRenderer.RenderLayoutClass(contentAreaItem, context, output);
+    }
+}
