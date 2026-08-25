@@ -13,6 +13,6 @@ public static class TagNormalizationHelper
             .Select(tag => tag.Trim().ToLowerInvariant())
             .Where(tag => !string.IsNullOrWhiteSpace(tag))
             .Distinct(StringComparer.Ordinal)
-            .ToList()!;
+            .ToList();
     }
 }

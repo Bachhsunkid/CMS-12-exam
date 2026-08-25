@@ -58,12 +58,18 @@ public class AuthorService(
         return author is null ? null : GetUrl(blog, author);
     }
 
+    public string? GetFirstAuthorUrl(BlogListPage blog)
+    {
+        var author = GetProfiles().FirstOrDefault();
+        return author is null ? null : GetUrl(blog, author);
+    }
+
     public string GetUrl(BlogListPage blog, AuthorProfileBlock author, int pageNumber = 1)
     {
         return $"{urlResolver.GetUrl(blog.ContentLink).TrimEnd('/')}/{AuthorRouteData.BuildRelativePath(author.Slug ?? string.Empty, pageNumber)}";
     }
 
-    private IReadOnlyList<AuthorProfileBlock> GetProfiles()
+    private IEnumerable<AuthorProfileBlock> GetProfiles()
     {
         var settings = siteSettingsResolver.Get(SiteDefinition.Current, CultureInfo.CurrentUICulture);
         if (settings is null || ContentReference.IsNullOrEmpty(settings.AuthorProfileFolder))
@@ -71,8 +77,8 @@ public class AuthorService(
             return [];
         }
 
-        return contentLoader
-            .GetChildren<AuthorProfileBlock>(settings.AuthorProfileFolder, new LanguageSelector(CultureInfo.CurrentUICulture.Name))
-            .ToList();
+        return contentLoader.GetChildren<AuthorProfileBlock>(
+            settings.AuthorProfileFolder,
+            new LanguageSelector(CultureInfo.CurrentUICulture.Name));
     }
 }

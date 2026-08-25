@@ -16,8 +16,8 @@ public class Globals
         [Display(Name = SystemTabNames.Content, Order = 20)]
         public const string Content = SystemTabNames.Content;
 
-        [Display(Name = "Contact", Order = 30)]
-        public const string Contact = "Contact";
+        [Display(Name = SystemTabNames.Settings, Order = 30)]
+        public const string Settings = SystemTabNames.Settings;
 
         [Display(Name = "Metadata", Order = 40)]
         public const string MetaData = "Metadata";
@@ -28,8 +28,8 @@ public class Globals
         [Display(Name = "Products", Order = 60)]
         public const string Products = "Products";
 
-        [Display(Name = SystemTabNames.Settings, Order = 70)]
-        public const string Settings = SystemTabNames.Settings;
+        [Display(Name = "Contact", Order = 70)]
+        public const string Contact = "Contact";
 
         [Display(Name = "SiteSettings", Order = 80)]
         public const string SiteSettings = "SiteSettings";

@@ -1,5 +1,6 @@
 using System.Globalization;
 using EPiServer.Web;
+using TrainingTest.Business.Models;
 using TrainingTest.Models.Blocks;
 using TrainingTest.Models.Pages;
 

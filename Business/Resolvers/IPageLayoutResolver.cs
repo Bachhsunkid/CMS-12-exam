@@ -1,3 +1,4 @@
+using TrainingTest.Business.Models;
 using TrainingTest.Models.Pages;
 
 namespace TrainingTest.Business.Resolvers;

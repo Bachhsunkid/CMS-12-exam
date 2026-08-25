@@ -1,6 +1,6 @@
 using TrainingTest.Models.Blocks;
 
-namespace TrainingTest.Business.Resolvers;
+namespace TrainingTest.Business.Models;
 
 public class PageLayoutModel
 {
