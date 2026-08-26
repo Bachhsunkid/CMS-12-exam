@@ -7,7 +7,7 @@ using TrainingTest.Models.ViewModels;
 
 namespace TrainingTest.Controllers;
 
-public class BlogPostPageController(UrlResolver urlResolver, IAuthorService authorService) : PageControllerBase<BlogPostPage>
+public class BlogPostPageController(IUrlResolver urlResolver, IAuthorService authorService) : PageControllerBase<BlogPostPage>
 {
     public IActionResult Index(BlogPostPage currentPage)
     {

@@ -35,6 +35,6 @@ public abstract class PageControllerBase<T> : PageController<T>
     public async Task<IActionResult> Logout()
     {
         await UISignInManager.Service.SignOutAsync();
-        return Redirect(HttpContext.RequestServices.GetService<UrlResolver>()!.GetUrl(PageContext.ContentLink, PageContext.LanguageID));
+        return Redirect(HttpContext.RequestServices.GetService<IUrlResolver>()!.GetUrl(PageContext.ContentLink, PageContext.LanguageID));
     }
 }

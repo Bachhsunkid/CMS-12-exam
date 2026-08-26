@@ -6,7 +6,7 @@ namespace TrainingTest.Business.Authoring;
 public interface IAuthorService
 {
     AuthorProfileBlock? GetBySlug(string slug);
-    IReadOnlyList<BlogPostPage> GetPosts(BlogListPage blog, AuthorProfileBlock author);
+    Task<AuthorPostSearchResult> GetPosts(BlogListPage blog, AuthorProfileBlock author, int pageNumber, int pageSize);
     string? GetUrl(BlogPostPage post);
     string? GetUrl(BlogListPage blog, string? authorName);
     string? GetFirstAuthorUrl(BlogListPage blog);

@@ -1,6 +1,6 @@
 @model BlogTeaserBlock
 @inject IContentLoader ContentLoader
-@inject UrlResolver UrlResolver
+@inject IUrlResolver UrlResolver
 @inject TrainingTest.Business.Authoring.IAuthorService AuthorService
 
 @if (Model.Post is { } postReference

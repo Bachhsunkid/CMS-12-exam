@@ -16,7 +16,7 @@ namespace TrainingTest.Business.Search;
 /// See https://docs.developers.optimizely.com/content-management-system/v1.1.0-search-and-navigation/docs/unified-search
 /// and https://docs.developers.optimizely.com/content-management-system/v1.1.0-search-and-navigation/docs/boosting-with-weights
 /// </summary>
-public class SiteSearchService(IClient client, UrlResolver urlResolver) : ISiteSearchService
+public class SiteSearchService(IClient client, IUrlResolver urlResolver) : ISiteSearchService
 {
     private readonly HitSpecification _hitSpec = new HitSpecification
     {

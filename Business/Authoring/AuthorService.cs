@@ -1,4 +1,6 @@
 using System.Globalization;
+using EPiServer.Find;
+using EPiServer.Find.Cms;
 using EPiServer.Web;
 using EPiServer.Web.Routing;
 using TrainingTest.Business.Resolvers;
@@ -13,7 +15,8 @@ namespace TrainingTest.Business.Authoring;
 public class AuthorService(
     ISiteSettingsResolver siteSettingsResolver,
     IContentLoader contentLoader,
-    UrlResolver urlResolver) : IAuthorService
+    IUrlResolver urlResolver,
+    IClient client) : IAuthorService
 {
     public AuthorProfileBlock? GetBySlug(string slug)
     {
@@ -22,23 +25,33 @@ public class AuthorService(
             : GetProfiles().FirstOrDefault(profile => string.Equals(profile.Slug, slug, StringComparison.OrdinalIgnoreCase));
     }
 
-    public IReadOnlyList<BlogPostPage> GetPosts(BlogListPage blog, AuthorProfileBlock author)
+    public async Task<AuthorPostSearchResult> GetPosts(
+        BlogListPage blog,
+        AuthorProfileBlock author,
+        int pageNumber,
+        int pageSize)
     {
-        if (string.IsNullOrWhiteSpace(author.FullName))
+        if (string.IsNullOrWhiteSpace(author.FullName) || pageSize < 1)
         {
-            return [];
+            return new AuthorPostSearchResult([], 0);
         }
 
         var authorName = author.FullName.Trim();
-
-        return contentLoader
-            .GetChildren<BlogPostPage>(blog.ContentLink, new LanguageSelector(CultureInfo.CurrentUICulture.Name))
-            .Where(post => post.Status == VersionStatus.Published &&
-                           post.PublishDate <= DateTime.Now &&
-                           string.Equals(post.Author?.Trim(), authorName, StringComparison.OrdinalIgnoreCase))
+        var skip = Math.Max(0, pageNumber - 1) * pageSize;
+        var result = await client
+            .Search<BlogPostPage>()
+            .FilterOnCurrentSite()
+            .FilterForVisitor()
+            .Filter(post => post.ParentLink.ID.Match(blog.ContentLink.ID))
+            .Filter(post => post.Author.Match(authorName))
+            .Filter(post => post.PublishDate.InRange(DateTime.MinValue, DateTime.Now))
             .OrderByDescending(post => post.PublishDate)
             .ThenByDescending(post => post.Changed)
-            .ToList();
+            .Skip(skip)
+            .Take(pageSize)
+            .GetContentResultAsync();
+
+        return new AuthorPostSearchResult(result.Items.ToList(), result.TotalMatching);
     }
 
     public string? GetUrl(BlogPostPage post)

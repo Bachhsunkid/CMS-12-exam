@@ -8,6 +8,10 @@
 appsettings.Development.json
 modules/_protected/Find/
 
+# Local SQL Server database files
+/App_Data/TrainingTest.mdf
+/App_Data/TrainingTest_log.ldf
+
 # User-specific files
 *.rsuser
 *.suo

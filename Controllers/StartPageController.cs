@@ -9,7 +9,7 @@ namespace TrainingTest.Controllers;
 
 public class StartPageController(
     IContentLoader contentLoader,
-    UrlResolver urlResolver,
+    IUrlResolver urlResolver,
     IAuthorService authorService) : PageControllerBase<StartPage>
 {
     public IActionResult Index(StartPage currentPage)

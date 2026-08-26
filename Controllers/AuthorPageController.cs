@@ -16,9 +16,9 @@ namespace TrainingTest.Controllers;
 public class AuthorPageController(
     IAuthorService authorService,
     IPageLayoutResolver pageLayoutResolver,
-    UrlResolver urlResolver) : Controller, IRenderTemplate<AuthorRouteData>
+    IUrlResolver urlResolver) : Controller, IRenderTemplate<AuthorRouteData>
 {
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         var routeData = HttpContext.Features.Get<IContentRouteFeature>()?.RoutedContentData.PartialRoutedObject as AuthorRouteData;
         if (routeData is null)
@@ -32,9 +32,18 @@ public class AuthorPageController(
             return RenderNotFound(routeData.Blog);
         }
 
-        var posts = authorService.GetPosts(routeData.Blog, author);
-        var totalPages = PaginationHelper.GetTotalPages(posts.Count, Constants.DefaultPageSize);
+        var result = await authorService.GetPosts(routeData.Blog, author, routeData.PageNumber, Constants.DefaultPageSize);
+        var totalPages = PaginationHelper.GetTotalPages(result.TotalPosts, Constants.DefaultPageSize);
         var currentPage = PaginationHelper.NormalizePage(routeData.PageNumber, totalPages);
+
+        if (currentPage != routeData.PageNumber)
+        {
+            result = await authorService.GetPosts(
+                routeData.Blog,
+                author,
+                currentPage,
+                Constants.DefaultPageSize);
+        }
 
         ViewData["Title"] = author.FullName;
         ViewData["PageCss"] = "/author.css";
@@ -44,10 +53,7 @@ public class AuthorPageController(
         {
             Blog = routeData.Blog,
             Author = author,
-            Posts = posts
-                .Skip(PaginationHelper.GetSkip(currentPage, Constants.DefaultPageSize))
-                .Take(Constants.DefaultPageSize)
-                .ToList(),
+            Posts = result.Posts,
             CurrentPageNumber = currentPage,
             TotalPages = totalPages
         });
