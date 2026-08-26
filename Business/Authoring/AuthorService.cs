@@ -70,16 +70,16 @@ public class AuthorService(
 
         return author is null ? null : GetUrl(blog, author);
     }
+    
+    public string GetUrl(BlogListPage blog, AuthorProfileBlock author, int pageNumber = 1)
+    {
+        return $"{urlResolver.GetUrl(blog.ContentLink).TrimEnd('/')}/{AuthorRouteData.BuildRelativePath(author.Slug ?? string.Empty, pageNumber)}";
+    }
 
     public string? GetFirstAuthorUrl(BlogListPage blog)
     {
         var author = GetProfiles().FirstOrDefault();
         return author is null ? null : GetUrl(blog, author);
-    }
-
-    public string GetUrl(BlogListPage blog, AuthorProfileBlock author, int pageNumber = 1)
-    {
-        return $"{urlResolver.GetUrl(blog.ContentLink).TrimEnd('/')}/{AuthorRouteData.BuildRelativePath(author.Slug ?? string.Empty, pageNumber)}";
     }
 
     private IEnumerable<AuthorProfileBlock> GetProfiles()

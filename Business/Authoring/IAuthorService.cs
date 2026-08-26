@@ -9,6 +9,6 @@ public interface IAuthorService
     Task<AuthorPostSearchResult> GetPosts(BlogListPage blog, AuthorProfileBlock author, int pageNumber, int pageSize);
     string? GetUrl(BlogPostPage post);
     string? GetUrl(BlogListPage blog, string? authorName);
-    string? GetFirstAuthorUrl(BlogListPage blog);
     string GetUrl(BlogListPage blog, AuthorProfileBlock author, int pageNumber = 1);
+    string? GetFirstAuthorUrl(BlogListPage blog);
 }

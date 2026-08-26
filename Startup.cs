@@ -39,8 +39,6 @@ public class Startup
         services.AddBlogDisplayOptions();
         services.AddBlogTinyMceConfiguration();
 
-        services.AddMemoryCache();
-
         services.AddScoped<IBlogSearchService, BlogSearchService>();
         services.AddScoped<ISiteSearchService, SiteSearchService>();
         services.AddScoped<IAuthorService, AuthorService>();
