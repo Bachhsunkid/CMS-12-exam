@@ -30,6 +30,8 @@ public static class SearchIndexFieldHelper
         return Math.Max(0, (int)Math.Floor((DateTime.Now - post.PublishDate.Value).TotalDays));
     }
     
+    
+    
     private static string StripHtml(this XhtmlString? xhtmlString)
     {
         if (xhtmlString is null || xhtmlString.IsEmpty)

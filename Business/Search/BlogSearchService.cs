@@ -111,8 +111,8 @@ public class BlogSearchService(IClient client, IAuthorService authorService) : I
                     post => post.Title,
                     post => post.Summary,
                     post => post.GetSearchableMainBody())
-                .BoostMatching(post => post.GetAgeInDays().LessThan(91), 1000)
-                .BoostMatching(post => post.Tags.Match("optimizely"), 2000)
+                .BoostMatching(post => post.GetAgeInDays().LessThan(91), 1.5)
+                .BoostMatching(post => post.Tags.Match("optimizely"), 2)
                 .ApplyBestBets();
         }
         

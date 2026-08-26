@@ -119,7 +119,8 @@ public class SeedBlogContentJob : ScheduledJobBase
         // The author folder is the one seed-owned prerequisite; its reference is persisted on Site Settings.
         // Reference: https://docs.developers.optimizely.com/content-management-system/docs/creating-and-editing-content
         if (!ContentReference.IsNullOrEmpty(settings.AuthorProfileFolder) &&
-            _contentLoader.TryGet(settings.AuthorProfileFolder, out ContentFolder? folder))
+            _contentLoader.TryGet(settings.AuthorProfileFolder, out ContentFolder? folder) &&
+            folder is not null)
         {
             return folder;
         }
@@ -130,7 +131,7 @@ public class SeedBlogContentJob : ScheduledJobBase
             return null;
         }
 
-        var newFolder = _contentRepository.GetDefault<ContentFolder>(settings.ParentLink);
+        var newFolder = _contentRepository.GetDefault<ContentFolder>(ContentReference.GlobalBlockFolder);
         newFolder.Name = "Author profiles";
         var folderReference = _contentRepository.Save(newFolder, SaveAction.Publish, AccessLevel.NoAccess);
 

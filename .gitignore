@@ -6,7 +6,7 @@
 # dotenv files
 .env
 appsettings.Development.json
-modules/_protected/Find/
+modules/
 
 # Local SQL Server database files
 /App_Data/TrainingTest.mdf
