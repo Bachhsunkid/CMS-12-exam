@@ -1,43 +1,51 @@
-@using TrainingTest.Business.Resolvers
-@{
-    var pageTitle = ViewData["Title"] as string ?? "Opti Blog";
-    var pageCss = ViewData["PageCss"] as string;
-    var pageScript = ViewData["PageScript"] as string;
-    var pageLayout = ViewData["PageLayout"] as PageLayoutModel;
-}
+@model IPageViewModel<SitePageData>
+
 <!doctype html>
-<html lang="en">
+<html lang="@(Model.CurrentPage.Language)">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>@pageTitle</title>
-    @if (!string.IsNullOrWhiteSpace(pageCss))
+    <title>
+        @if (string.IsNullOrWhiteSpace(Model.CurrentPage.MetaTitle))
+        {
+            @Model.Layout?.SiteName
+        }
+        else
+        {
+            @string.Join(" | ", Model.CurrentPage.MetaTitle, Model.Layout?.SiteName)
+        }
+    </title>
+    @if (Model.CurrentPage.MetaKeywords != null && Model.CurrentPage.MetaKeywords.Count > 0)
     {
-        <link rel="stylesheet" crossorigin href="@pageCss"/>
+        <meta name="keywords" content="@string.Join(",", Model.CurrentPage.MetaKeywords)" />
     }
+    @if (!string.IsNullOrWhiteSpace(Model.CurrentPage.MetaDescription))
+    {
+        <meta name="description" content="@Model.CurrentPage.MetaDescription" />
+    }
+    <link rel="stylesheet" href="~/author.css" />
+    <link rel="stylesheet" href="~/blog-landing-page.css" />
+    <link rel="stylesheet" href="~/blog-post-page.css" />
+    <link rel="stylesheet" href="~/index.css" />
+    <link rel="stylesheet" href="~/not-found.css" />
+    <link rel="stylesheet" href="~/site-search.css" />
 </head>
 <body>
-
 @* @await Html.RenderEPiServerQuickNavigatorAsync() *@
 
 <div class="page-layout">
-    @if (pageLayout?.Header is not null)
+    @if (Model.Layout?.Header is not null)
     {
-        <partial name="Header" model="pageLayout.Header"/>
+        <partial name="Header" model="Model.Layout.Header"/>
     }
     <main class="page-main">
         @RenderBody()
     </main>
-    @if (pageLayout?.Footer is not null)
+    @if (Model.Layout?.Footer is not null)
     {
-        <partial name="Footer" model="pageLayout.Footer"/>
+        <partial name="Footer" model="Model.Layout.Footer"/>
     }
 </div>
-
-@if (!string.IsNullOrWhiteSpace(pageScript))
-{
-    <script type="module" crossorigin src="@pageScript"></script>
-}
 
 @await RenderSectionAsync("Scripts", required: false)
 </body>

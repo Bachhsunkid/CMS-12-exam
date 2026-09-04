@@ -10,9 +10,10 @@ public class SiteSearchPageController(ISiteSearchService siteSearchService)
 {
     public async Task<IActionResult> Index(SiteSearchPage currentPage)
     {
-        ViewData["PageCss"] = "/site-search.css";
-        SetPageLayout(currentPage);
+        // SetPageLayout(currentPage);
+        
+        var siteSearchModel = await siteSearchService.SearchAsync(currentPage, SiteSearchRequest.Parse(Request.Query));
 
-        return View(await siteSearchService.SearchAsync(currentPage, SiteSearchRequest.Parse(Request.Query)));
+        return View(siteSearchModel);
     }
 }

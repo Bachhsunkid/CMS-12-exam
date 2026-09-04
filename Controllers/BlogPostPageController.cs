@@ -11,12 +11,8 @@ public class BlogPostPageController(IUrlResolver urlResolver, IAuthorService aut
 {
     public IActionResult Index(BlogPostPage currentPage)
     {
-        ViewData["PageCss"] = "/blog-post-page.css";
-        SetPageLayout(currentPage);
-        
-        return View(new BlogPostViewModel
+        return View(new BlogPostViewModel(currentPage)
         {
-            BlogPost = currentPage,
             ReadingTimeMinutes = currentPage.MainBody.EstimateReadingTime(),
             HeroImageUrl = ContentReference.IsNullOrEmpty(currentPage.HeroImage)
                 ? null

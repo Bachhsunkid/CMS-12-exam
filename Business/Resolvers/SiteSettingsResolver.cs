@@ -11,7 +11,7 @@ public class SiteSettingsResolver : ISiteSettingsResolver, IDisposable
     // Reference: https://docs.developers.optimizely.com/content-management-system/docs/object-caching
     private const string CacheMasterKey = "TrainingTest:SiteSettings";
     private readonly IContentLoader _contentLoader;
-    private readonly ISynchronizedObjectInstanceCache _cache;
+    private readonly ISynchronizedObjectInstanceCache _cache; // no need cache manually, as IContentLoader is already cached.
     private readonly IContentEvents _contentEvents;
 
     public SiteSettingsResolver(

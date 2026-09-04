@@ -10,8 +10,7 @@ public class BlogListPageController(IBlogSearchService blogSearchService)
 {
     public async Task<IActionResult> Index(BlogListPage currentPage)
     {
-        ViewData["PageCss"] = "/blog-landing-page.css";
-        SetPageLayout(currentPage);
+        // SetPageLayout(currentPage);
         var searchResult = await blogSearchService.SearchAsync(currentPage, BlogSearchRequest.Parse(Request.Query));
         return View(searchResult);
     }

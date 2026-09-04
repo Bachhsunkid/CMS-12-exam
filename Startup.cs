@@ -8,6 +8,7 @@ using TrainingTest.Business.Authoring;
 using TrainingTest.Business.Initialization;
 using TrainingTest.Business.Resolvers;
 using TrainingTest.Business.Search;
+using TrainingTest.Extensions;
 
 namespace TrainingTest;
 
@@ -32,6 +33,7 @@ public class Startup
         services
             .AddCmsAspNetIdentity<ApplicationUser>()
             .AddCms()
+            .AddTrainingTest()
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
         

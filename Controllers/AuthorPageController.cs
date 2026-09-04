@@ -45,8 +45,8 @@ public class AuthorPageController(
                 Constants.DefaultPageSize);
         }
 
+        // TODO: do not use ViewData
         ViewData["Title"] = author.FullName;
-        ViewData["PageCss"] = "/author.css";
         ViewData["PageLayout"] = pageLayoutResolver.Resolve(routeData.Blog);
 
         return View(new AuthorPageViewModel
@@ -63,7 +63,6 @@ public class AuthorPageController(
     {
         Response.StatusCode = StatusCodes.Status404NotFound;
         ViewData["Title"] = "Page not found";
-        ViewData["PageCss"] = "/not-found.css";
         ViewData["PageLayout"] = pageLayoutResolver.Resolve(blog);
 
         return View("~/Views/Shared/NotFound.cshtml", new NotFoundViewModel

@@ -47,9 +47,8 @@ public class SiteSearchService(IClient client, IUrlResolver urlResolver) : ISite
                 .GetResultAsync(_hitSpec);
         }
 
-        return new SiteSearchViewModel
+        return new SiteSearchViewModel(searchPage)
         {
-            Page = searchPage,
             Request = request,
             Results = searchResult.Select(MapResult).ToList(),
             TotalResults = searchResult.TotalMatching,

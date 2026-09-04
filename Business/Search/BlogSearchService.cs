@@ -65,9 +65,8 @@ public class BlogSearchService(IClient client, IAuthorService authorService) : I
                 .GetContentResultAsync();
         }
 
-        return new BlogSearchViewModel
+        return new BlogSearchViewModel(blog)
         {
-            Blog = blog,
             Request = request,
             Posts = selectedPostsResult.Items
                 .Select(post => new BlogPostListItemViewModel

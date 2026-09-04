@@ -21,7 +21,7 @@ public class SitePageData : PageData
         Description = "Meta keywords are used for SEO. They should be relevant to the page content and separated by commas.",
         GroupName = Globals.GroupNames.MetaData, 
         Order = 200)]
-    public virtual string? MetaKeywords { get; set; }
+    public virtual IList<string>? MetaKeywords { get; set; }
 
     [CultureSpecific]
     [Display(Name = "Meta description",

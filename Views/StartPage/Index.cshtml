@@ -1,4 +1,4 @@
-@model StartPageViewModel
+@model PageViewModel<StartPage>
 
 <div class="container">
     <h1>Opti Blog &mdash; page index</h1>
@@ -6,23 +6,23 @@
 
     <ul class="index-list" role="list">
         <li class="index-list__item">
-            <a href="@Model.BlogUrl">Blog landing page</a>
+            @* <a href="@Model.BlogUrl">Blog landing page</a> *@
             <p>Search, tag and date facets, sort, quick-reads filter, paged teaser grid.</p>
         </li>
         <li class="index-list__item">
-            <a href="@Model.BlogPostUrl">Blog post detail</a>
+            @* <a href="@Model.BlogPostUrl">Blog post detail</a> *@
             <p>Hero, meta, tags, rich-text styles demo, related posts (full/half/card layouts).</p>
         </li>
         <li class="index-list__item">
-            <a href="@(Model.AuthorUrl ?? Model.BlogUrl)">Author profile</a>
+            @* <a href="@(Model.AuthorUrl ?? Model.BlogUrl)">Author profile</a> *@
             <p>Author bio and their posts. Try Jane Doe, John Smith or Maria Garcia.</p>
         </li>
         <li class="index-list__item">
-            <a href="@Model.SearchUrl">Site-wide search</a>
+            @* <a href="@Model.SearchUrl">Site-wide search</a> *@
             <p>Mixed results across pages, blog posts and documents, with a type filter.</p>
         </li>
         <li class="index-list__item">
-            <a href="@Model.NotFoundUrl">404 / not-found</a>
+            @* <a href="@Model.NotFoundUrl">404 / not-found</a> *@
             <p>Served for unrecognized authors and other missing content.</p>
         </li>
     </ul>
