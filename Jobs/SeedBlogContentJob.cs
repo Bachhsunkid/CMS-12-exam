@@ -1,5 +1,5 @@
-using System.Globalization;
 using EPiServer.DataAccess;
+using EPiServer.Globalization;
 using EPiServer.PlugIn;
 using EPiServer.Scheduler;
 using EPiServer.Security;
@@ -89,7 +89,7 @@ public class SeedBlogContentJob : ScheduledJobBase
     private void SeedSite(SiteDefinition site, BlogSeedData seedData, DateTime now, BlogContentSeedResult result)
     {
         // A missing settings page or Blog List is configuration to fix, not content this job should create.
-        var settings = _siteSettingsResolver.Get(site, CultureInfo.CurrentUICulture);
+        var settings = _siteSettingsResolver.Get(site, ContentLanguage.PreferredCulture);
         if (settings is null)
         {
             result.Messages.Add($"{site.Name}: Site settings were not found; no content was seeded.");

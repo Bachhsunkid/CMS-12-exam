@@ -1,6 +1,5 @@
-using System.Globalization;
+using EPiServer.Globalization;
 using EPiServer.Web;
-using TrainingTest.Business.Models;
 using TrainingTest.Models.Blocks;
 using TrainingTest.Models.Pages;
 
@@ -10,28 +9,15 @@ public class PageLayoutResolver(
     ISiteSettingsResolver siteSettingsResolver,
     IContentLoader contentLoader) : IPageLayoutResolver
 {
-    // Resolves the header and footer rendered for a page from its Inherit, Override, or Hidden behavior.
-    // Reference: https://docs.developers.optimizely.com/content-management-system/docs/dependency-injection
-    public LayoutModel Resolve(SitePageData page)
-    {
-        var settings = siteSettingsResolver.Get(SiteDefinition.Current, CultureInfo.CurrentUICulture);
-
-        return new LayoutModel
-        {
-            Header = ResolveBlock<HeaderBlock>((HeaderFooterBehavior)page.HeaderBehavior, page.HeaderOverride, settings?.DefaultHeader),
-            Footer = ResolveBlock<FooterBlock>((HeaderFooterBehavior)page.FooterBehavior, page.FooterOverride, settings?.DefaultFooter)
-        };
-    }
-    
     public HeaderBlock? ResolveHeader(SitePageData page)
     {
-        var settings = siteSettingsResolver.Get(SiteDefinition.Current, CultureInfo.CurrentUICulture);
+        var settings = siteSettingsResolver.Get(SiteDefinition.Current, ContentLanguage.PreferredCulture);
         return ResolveBlock<HeaderBlock>((HeaderFooterBehavior)page.HeaderBehavior, page.HeaderOverride, settings?.DefaultHeader);
     }
     
     public FooterBlock? ResolveFooter(SitePageData page)
     {
-        var settings = siteSettingsResolver.Get(SiteDefinition.Current, CultureInfo.CurrentUICulture);
+        var settings = siteSettingsResolver.Get(SiteDefinition.Current, ContentLanguage.PreferredCulture);
         return ResolveBlock<FooterBlock>((HeaderFooterBehavior)page.FooterBehavior, page.FooterOverride, settings?.DefaultFooter);
     }
 

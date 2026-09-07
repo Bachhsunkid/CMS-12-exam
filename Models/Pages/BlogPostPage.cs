@@ -38,7 +38,6 @@ public class BlogPostPage : SitePageData
     public virtual XhtmlString? MainBody { get; set; }
     
     [UIHint(UIHint.Image)]
-    [AllowedTypes(typeof(Media.ImageFile))]
     [Display(Name = "Hero image", 
         GroupName = Globals.GroupNames.Content, 
         Order = 40)]
@@ -55,7 +54,7 @@ public class BlogPostPage : SitePageData
     [Display(Name = "Author", 
         GroupName = Globals.GroupNames.Publishing, 
         Order = 20)]
-    public virtual string? Author { get; set; }
+    public virtual string? Author { get; set; } // how to migrate to ContentReference
 
     [CultureSpecific]
     [BackingType(typeof(PropertyStringList))]

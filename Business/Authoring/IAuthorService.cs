@@ -1,3 +1,4 @@
+using EPiServer.Find.Cms;
 using TrainingTest.Models.Blocks;
 using TrainingTest.Models.Pages;
 
@@ -5,10 +6,10 @@ namespace TrainingTest.Business.Authoring;
 
 public interface IAuthorService
 {
-    AuthorProfileBlock? GetBySlug(string slug);
-    Task<AuthorPostSearchResult> GetPosts(BlogListPage blog, AuthorProfileBlock author, int pageNumber, int pageSize);
-    string? GetUrl(BlogPostPage post);
-    string? GetUrl(BlogListPage blog, string? authorName);
-    string GetUrl(BlogListPage blog, AuthorProfileBlock author, int pageNumber = 1);
-    string? GetFirstAuthorUrl(BlogListPage blog);
+    Task<AuthorProfileBlock?> GetBySlug(string slug);
+    Task<IContentResult<BlogPostPage>> GetPosts(BlogListPage blog, AuthorProfileBlock author, int pageNumber, int pageSize);
+    Task<string?> GetUrl(BlogPostPage post);
+    Task<Dictionary<string, string>> GetUrls(BlogListPage blog, List<string> authorNames);
+    Task<string?> GetFirstAuthorUrl(BlogListPage blog);
+    string? GetPartialUrl(BlogListPage blog, AuthorProfileBlock author, int pageNumber = 1);
 }

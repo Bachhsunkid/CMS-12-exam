@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using EPiServer.SpecializedProperties;
 
 namespace TrainingTest.Models.Blocks;
 
@@ -24,6 +23,7 @@ public class HeaderBlock : SiteBlockData
 
     [Display(Name = "Navigation links", 
         GroupName = Globals.GroupNames.Content, 
-        Order = 30)]
-    public virtual LinkItemCollection? NavigationLinks { get; set; }
+        Order = 40)]
+    // public virtual LinkItemCollection? NavigationLinks { get; set; }
+    public virtual ContentArea? NewNavigationLinks { get; set; } // use ContentArea for personalization
 }

@@ -26,6 +26,7 @@ modules/
 mono_crash.*
 
 # Build results
+/tmp/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/

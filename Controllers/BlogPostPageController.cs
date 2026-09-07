@@ -9,7 +9,7 @@ namespace TrainingTest.Controllers;
 
 public class BlogPostPageController(IUrlResolver urlResolver, IAuthorService authorService) : PageControllerBase<BlogPostPage>
 {
-    public IActionResult Index(BlogPostPage currentPage)
+    public async Task<IActionResult> Index(BlogPostPage currentPage)
     {
         return View(new BlogPostViewModel(currentPage)
         {
@@ -17,7 +17,7 @@ public class BlogPostPageController(IUrlResolver urlResolver, IAuthorService aut
             HeroImageUrl = ContentReference.IsNullOrEmpty(currentPage.HeroImage)
                 ? null
                 : urlResolver.GetUrl(currentPage.HeroImage),
-            AuthorUrl = authorService.GetUrl(currentPage)
+            AuthorUrl = await authorService.GetUrl(currentPage)
         });
     }
 }

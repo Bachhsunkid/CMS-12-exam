@@ -35,7 +35,7 @@ public class BlogSearchService(
             var posts = await postsTask;
             var facets = await facetsTask;
 
-            return MapToViewModel(blog, request, request.Page, pageSize, posts, facets);
+            return await MapToViewModel(blog, request, request.Page, pageSize, posts, facets);
         }
         catch (Exception ex)
         {
@@ -49,6 +49,19 @@ public class BlogSearchService(
         BlogListPage blog, BlogSearchRequest request, DateTime searchNow, int page, int pageSize)
     {
         var query = client.Search<BlogPostPage>();
+
+        // var test = BaseQuery(query, blog, request, searchNow)
+        //     .WithTag(request.Tag)
+        //     .WithPeriod(request.PeriodDays, searchNow)
+        //     .WithSort(request.Sort)
+        //     .TermsFacetFor(p => p.Tags, command => command.Size = Constants.TagFacetSize)
+        //     .FilterFacet(Constants.Periods[0].Label, p => p.PublishDate.InRange(searchNow.AddDays(-Constants.Periods[0].Days), searchNow))
+        //     .FilterFacet(Constants.Periods[1].Label, p => p.PublishDate.InRange(searchNow.AddDays(-Constants.Periods[1].Days), searchNow))
+        //     .FilterFacet(Constants.Periods[2].Label, p => p.PublishDate.InRange(searchNow.AddDays(-Constants.Periods[2].Days), searchNow))
+        //     .FilterFacet("all", p => p.PublishDate.Before(searchNow))
+        //     .Skip((page - 1) * pageSize)
+        //     .Take(pageSize) // default is 10, maximum is 1000
+        //     .GetContentResultAsync().Result;
 
         return BaseQuery(query, blog, request, searchNow)
             .WithTag(request.Tag)
@@ -95,7 +108,7 @@ public class BlogSearchService(
                 .ApplyBestBets();
         }
 
-        query.FilterOnCurrentSite()
+        query = query.FilterOnCurrentSite()
             .FilterForVisitor()
             .Filter(p => p.ParentLink.ID.Match(blog.ContentLink.ID))
             .Filter(p => p.PublishDate.Before(searchNow));
@@ -121,10 +134,17 @@ public class BlogSearchService(
 
     private static string PeriodFacetKey(int days) => $"period-{days}";
 
-    private BlogSearchViewModel MapToViewModel(
+    private async Task<BlogSearchViewModel> MapToViewModel(
         BlogListPage blog, BlogSearchRequest request, int page, int pageSize,
         IContentResult<BlogPostPage> posts, BlogFacetResults facets)
     {
+        var authorNames = posts
+            .Select(p => p.Author)
+            .Where(a => !string.IsNullOrWhiteSpace(a)).Distinct()
+            .ToList();
+
+        var authorUrls = await authorService.GetUrls(blog, authorNames!);
+
         return new(blog)
         {
             Request = request,
@@ -133,7 +153,7 @@ public class BlogSearchService(
             Posts = posts.Select(post => new BlogPostListItemViewModel
             {
                 Post = post,
-                AuthorUrl = authorService.GetUrl(blog, post.Author)
+                AuthorUrl = authorUrls.TryGetValue(post.Author ?? string.Empty, out var url) ? url : null
             }).ToList(),
             Paging = new PagingViewModelBase
             {
@@ -148,8 +168,7 @@ public class BlogSearchService(
     {
         return result
             .TermsFacetFor(p => p.Tags).Terms
-            .OrderByDescending(facet => facet.Count)
-            .ThenBy(facet => facet.Term)
+            .OrderBy(facet => facet.Term)
             .Select(facet => new BlogSearchFacetOption
             {
                 Value = facet.Term,

@@ -1,44 +1,11 @@
-@using Microsoft.AspNetCore.WebUtilities
+@inject ISearchUrlBuilder SearchUrlBuilder
 @model SiteSearchViewModel
-
-@{
-    var searchPageUrl = Url.ContentUrl(Model.Page.ContentLink);
-
-    string BuildSearchUrl(SiteSearchType type, int page)
-    {
-        var query = new Dictionary<string, string?>();
-
-        if (!string.IsNullOrWhiteSpace(Model.Request.Query))
-        {
-            query["q"] = Model.Request.Query;
-        }
-
-        if (type != SiteSearchType.All)
-        {
-            query["type"] = type.ToString();
-        }
-
-        if (page > 1)
-        {
-            query["page"] = page.ToString();
-        }
-
-        return QueryHelpers.AddQueryString(searchPageUrl, query);
-    }
-
-    string TypeLabel(SiteSearchType type) => type switch
-    {
-        SiteSearchType.BlogPost => "Blog post",
-        SiteSearchType.Document => "Document",
-        _ => "Page"
-    };
-}
 
 <main class="page-main">
     <div class="container">
         <h1>Search</h1>
 
-        <form class="search-box" method="get" action="@searchPageUrl">
+        <form class="search-box" method="get" action="@Url.ContentUrl(Model.Page.ContentLink)">
             <input type="search" class="search-box__input" id="search-input" name="q" value="@Model.Request.Query" placeholder="Search the whole site…" aria-label="Search the whole site" />
             @if (Model.Request.Type != SiteSearchType.All)
             {
@@ -50,15 +17,7 @@
         <nav class="site-search__type-filter" aria-label="Filter by content type">
             @foreach (var type in new[] { SiteSearchType.All, SiteSearchType.Page, SiteSearchType.BlogPost, SiteSearchType.Document })
             {
-                var label = type switch
-                {
-                    SiteSearchType.All => "All",
-                    SiteSearchType.Page => "Pages",
-                    SiteSearchType.BlogPost => "Blog posts",
-                    SiteSearchType.Document => "Documents",
-                    _ => "Unknown type"
-                };
-                <a class="type-filter__option@(Model.Request.Type == type ? " is-selected" : string.Empty)" href="@BuildSearchUrl(type, 1)">@label</a>
+                <a class="type-filter__option@(Model.Request.Type == type ? " is-selected" : string.Empty)" href="@SearchUrlBuilder.GetSiteSearchUrl(Model, type)">@SearchUrlBuilder.GetSiteSearchTypeLabel(type)</a>
             }
         </nav>
 
@@ -74,7 +33,7 @@
                 foreach (var result in Model.Results)
                 {
                     <li class="search-result">
-                        <span class="search-result__type">@TypeLabel(result.Type)</span>
+                        <span class="search-result__type">@SearchUrlBuilder.GetSiteSearchTypeLabel(result.Type)</span>
                         <h3 class="search-result__title"><a href="@result.Url">@result.Title</a></h3>
                         @if (!string.IsNullOrWhiteSpace(result.Excerpt))
                         {
@@ -99,7 +58,7 @@
             <nav class="pagination" id="pagination-container" aria-label="Pagination">
                 @for (var pageNumber = 1; pageNumber <= Model.Paging.TotalPages; pageNumber++)
                 {
-                    <a class="pagination__page@(pageNumber == Model.Paging.CurrentPage ? " is-current" : string.Empty)" href="@BuildSearchUrl(Model.Request.Type, pageNumber)" aria-current="@(pageNumber == Model.Paging.CurrentPage ? "page" : null)">@pageNumber</a>
+                    <a class="pagination__page@(pageNumber == Model.Paging.CurrentPage ? " is-current" : string.Empty)" href="@SearchUrlBuilder.GetSiteSearchUrl(Model, Model.Request.Type, pageNumber)" aria-current="@(pageNumber == Model.Paging.CurrentPage ? "page" : null)">@pageNumber</a>
                 }
             </nav>
         }

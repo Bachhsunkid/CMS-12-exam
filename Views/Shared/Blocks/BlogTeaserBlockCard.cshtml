@@ -7,7 +7,7 @@
      && !ContentReference.IsNullOrEmpty(postReference)
      && ContentLoader.TryGet<BlogPostPage>(postReference, out var post))
 {
-    var authorUrl = AuthorService.GetUrl(post);
+    var authorUrl = await AuthorService.GetUrl(post);
     <article class="teaser teaser--card">
         @if (!ContentReference.IsNullOrEmpty(post.HeroImage))
         {

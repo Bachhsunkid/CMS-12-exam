@@ -31,9 +31,10 @@ public class SiteSearchService(IClient client, IUrlResolver urlResolver) : ISite
 
         search = ApplyTypeFilter(search, request.Type);
 
+        var pageSize = Constants.DefaultSearchPageSize;
         var searchResult = await search
-            .Skip(PaginationHelper.GetSkip(request.Page, Constants.DefaultSearchPageSize))
-            .Take(Constants.DefaultSearchPageSize)
+            .Skip((request.Page - 1) * pageSize)
+            .Take(pageSize)
             .GetResultAsync(_hitSpec);
 
         return new SiteSearchViewModel(searchPage)
@@ -43,7 +44,7 @@ public class SiteSearchService(IClient client, IUrlResolver urlResolver) : ISite
             Paging = new PagingViewModelBase
             {
                 CurrentPage = request.Page,
-                PageSize = Constants.DefaultSearchPageSize,
+                PageSize = pageSize,
                 TotalItems = searchResult.TotalMatching
             }
         };

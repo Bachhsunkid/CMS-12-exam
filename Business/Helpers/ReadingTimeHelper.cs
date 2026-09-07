@@ -5,6 +5,8 @@ namespace TrainingTest.Business.Helpers;
 public static class ReadingTimeHelper
 {
     private const int WordsPerMinute = 200;
+    private const string WordPattern = @"\b\w+\b";
+    private const string HtmlTagPattern = @"<[^>]+>";
 
     public static int EstimateReadingTime(this XhtmlString? xhtmlString)
     {
@@ -13,20 +15,9 @@ public static class ReadingTimeHelper
             return 0;
         }
 
-        var plainText = Regex.Replace(xhtmlString.ToHtmlString(), "<[^>]+>", " ");
-        var words = Regex.Matches(plainText, @"\b\w+\b").Count;
+        var plainText = Regex.Replace(xhtmlString.ToHtmlString(), HtmlTagPattern, " ");
+        var words = Regex.Matches(plainText, WordPattern).Count;
 
-        return Math.Max(1, (int)Math.Ceiling((double)words / WordsPerMinute));
-    }
-
-    public static int EstimateReadingTime(this string? plainText)
-    {
-        if (string.IsNullOrWhiteSpace(plainText))
-        {
-            return 0;
-        }
-
-        var words = Regex.Matches(plainText, @"\b\w+\b").Count;
         return Math.Max(1, (int)Math.Ceiling((double)words / WordsPerMinute));
     }
 }

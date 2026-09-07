@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using EPiServer.Web;
 
 namespace TrainingTest.Models.Blocks;
@@ -28,4 +29,16 @@ public class AuthorProfileBlock : SiteBlockData
 
     [Display(Name = "Post count", GroupName = Globals.GroupNames.Publishing, Order = 10)]
     public virtual int PostCount { get; set; }
+    
+    [JsonIgnore]
+    public virtual string InitialName => GetInitials(FullName);
+    
+    private static string GetInitials(string? fullName)
+    {
+        return string.Concat((fullName ?? string.Empty)
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Take(2)
+                .Select(name => name[0]))
+            .ToUpperInvariant();
+    }
 }

@@ -4,7 +4,7 @@
 <div class="container">
     <header class="author-profile__header">
         <div class="author-profile__avatar teaser__media--placeholder" aria-hidden="true">
-            @GetInitials(Model.Author.FullName)
+            @Model.Author.InitialName
         </div>
         <div>
             <h1>@Model.Author.FullName</h1>
@@ -47,31 +47,21 @@
         }
     </ul>
 
-    @if (Model.TotalPages > 1)
+    @if (Model.Paging.TotalPages > 1)
     {
         <nav class="pagination" aria-label="Pagination">
-            @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+            @for (var pageNumber = 1; pageNumber <= Model.Paging.TotalPages; pageNumber++)
             {
-                if (pageNumber == Model.CurrentPageNumber)
+                if (pageNumber == Model.Paging.CurrentPage)
                 {
                     <span class="pagination__page is-current" aria-current="page">@pageNumber</span>
                 }
                 else
                 {
-                    <a class="pagination__page" href="@AuthorService.GetUrl(Model.Blog, Model.Author, pageNumber)">@pageNumber</a>
+                    <a class="pagination__page" href="@AuthorService.GetPartialUrl(Model.Blog, Model.Author, pageNumber)">@pageNumber</a>
                 }
             }
         </nav>
     }
 </div>
 
-@functions {
-    private static string GetInitials(string? fullName)
-    {
-        return string.Concat((fullName ?? string.Empty)
-            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-            .Take(2)
-            .Select(name => name[0]))
-            .ToUpperInvariant();
-    }
-}

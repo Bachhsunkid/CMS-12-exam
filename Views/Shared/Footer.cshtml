@@ -3,11 +3,14 @@
 <footer class="site-footer">
     <div class="container site-footer__inner">
         <p>@Model.CopyrightText</p>
-        <ul class="site-footer__links" role="list">
-            @foreach (var link in Model.Links ?? [])
-            {
-                <li>@Html.ContentLink(link)</li>
-            }
-        </ul>
+        @if (Model.NavigationLinks is not null)
+        {
+            <ul class="site-footer__links" role="list">
+                @foreach (var item in Model.NavigationLinks.FilteredItems)
+                {
+                    <li>@Html.ContentLink(item.ContentLink)</li>
+                }
+            </ul>
+        }
     </div>
 </footer>

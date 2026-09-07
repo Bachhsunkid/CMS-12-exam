@@ -17,8 +17,8 @@ public class FooterBlock : SiteBlockData
         Order = 10)]
     public virtual required string CopyrightText { get; set; }
 
-    [Display(Name = "Links", 
+    [Display(Name = "Navigation Links", 
         GroupName = Globals.GroupNames.Content, 
         Order = 20)]
-    public virtual LinkItemCollection? Links { get; set; }
+    public virtual ContentArea? NavigationLinks { get; set; } // use ContentArea for personalization
 }

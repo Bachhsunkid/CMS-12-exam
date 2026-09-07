@@ -1,3 +1,4 @@
+@using EPiServer.Framework.Web.Mvc.Html
 @model IPageViewModel<SitePageData>
 
 <!doctype html>
@@ -29,6 +30,9 @@
     <link rel="stylesheet" href="~/index.css" />
     <link rel="stylesheet" href="~/not-found.css" />
     <link rel="stylesheet" href="~/site-search.css" />
+    
+    @* required for DXP tracking *@
+    @Html.RequiredClientResources("Header") 
 </head>
 <body>
 @* @await Html.RenderEPiServerQuickNavigatorAsync() *@
@@ -48,6 +52,7 @@
 </div>
 
 @await RenderSectionAsync("Scripts", required: false)
+@Html.RequiredClientResources("Footer")
 </body>
 </html>
 
