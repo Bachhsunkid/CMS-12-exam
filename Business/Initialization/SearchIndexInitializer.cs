@@ -31,7 +31,6 @@ public class SearchIndexInitializer : IInitializableModule
         client.Conventions.ForInstancesOf<BlogPostPage>()
             .IncludeField(post => post.GetReadingTimeMinutes())
             .IncludeField(post => post.GetSearchableMainBody())
-            .IncludeField(post => post.GetAgeInDays())
             .ExcludeField(post => post.InternalNotes);
 
         // A published post is not searchable until its editorial publish date is reached.

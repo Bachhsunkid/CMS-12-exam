@@ -12,7 +12,7 @@
         if (!string.IsNullOrWhiteSpace(Model.Request.Query)) query["q"] = Model.Request.Query;
         if (!string.IsNullOrWhiteSpace(tag)) query["tag"] = tag;
         if (periodDays.HasValue) query["period"] = periodDays.Value.ToString();
-        if (Model.Request.QuickReadsOnly) query["quickreads"] = "1";
+        if (Model.Request.QuickReadsOnly) query["quickreads"] = "true";
         if (Model.Request.Sort == BlogSearchSort.Newest) query["sort"] = "newest";
         if (page > 1) query["page"] = page.ToString();
 
@@ -78,7 +78,7 @@
             </div>
 
             <label class="search-box__toggle">
-                <input type="checkbox" id="quick-reads-toggle" name="quickreads" value="1"
+                <input type="checkbox" id="quick-reads-toggle" name="quickreads" value="true"
                        form="blog-search-form" checked="@Model.Request.QuickReadsOnly" />
                 Quick reads only (under 3 min)
             </label>
@@ -103,17 +103,23 @@
                 <button class="btn btn-primary" type="submit">Search</button>
             </form>
 
-            <p class="blog-landing__count" id="results-count" aria-live="polite">
-                @Model.TotalPosts post@(Model.TotalPosts == 1 ? string.Empty : "s") found
-            </p>
-
-            @if (Model.Posts.Count == 0)
+            @if (Model.SearchUnavailable)
             {
-                <p class="blog-landing__empty">No posts match your filters.</p>
+                <p class="blog-landing__empty" role="alert">Search is temporarily unavailable. Please try again shortly.</p>
             }
             else
             {
-                <ul class="content-area" id="post-list" data-component="teaser-list" role="list">
+                <p class="blog-landing__count" id="results-count" aria-live="polite">
+                    @Model.Paging.TotalItems post@(Model.Paging.TotalItems == 1 ? string.Empty : "s") found
+                </p>
+
+                @if (Model.Posts.Count == 0)
+                {
+                    <p class="blog-landing__empty">No posts match your filters.</p>
+                }
+                else
+                {
+                    <ul class="content-area" id="post-list" data-component="teaser-list" role="list">
                     @foreach (var item in Model.Posts)
                     {
                         var post = item.Post;
@@ -158,16 +164,17 @@
                             </article>
                         </li>
                     }
-                </ul>
+                    </ul>
+                }
             }
 
             <div id="pagination-container">
-                @if (Model.TotalPages > 1)
+                @if (Model.Paging.TotalPages > 1)
                 {
                     <nav class="pagination" aria-label="Pagination">
-                        @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                        @for (var pageNumber = 1; pageNumber <= Model.Paging.TotalPages; pageNumber++)
                         {
-                            if (pageNumber == Model.CurrentPageNumber)
+                            if (pageNumber == Model.Paging.CurrentPage)
                             {
                                 <span class="pagination__page is-current" aria-current="page">@pageNumber</span>
                             }

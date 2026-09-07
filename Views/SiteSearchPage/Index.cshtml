@@ -15,13 +15,7 @@
 
         if (type != SiteSearchType.All)
         {
-            query["type"] = type switch
-            {
-                SiteSearchType.Page => "page",
-                SiteSearchType.BlogPost => "blog-post",
-                SiteSearchType.Document => "document",
-                _ => null
-            };
+            query["type"] = type.ToString();
         }
 
         if (page > 1)
@@ -48,7 +42,7 @@
             <input type="search" class="search-box__input" id="search-input" name="q" value="@Model.Request.Query" placeholder="Search the whole site…" aria-label="Search the whole site" />
             @if (Model.Request.Type != SiteSearchType.All)
             {
-                <input type="hidden" name="type" value="@Model.Request.Type.ToString().ToLowerInvariant().Replace("blogpost", "blog-post")" />
+                <input type="hidden" name="type" value="@Model.Request.Type" />
             }
             <button class="btn btn-primary" type="submit">Search</button>
         </form>
@@ -68,7 +62,7 @@
             }
         </nav>
 
-        <p id="results-count" class="blog-landing__count" aria-live="polite">@Model.TotalResults result@(Model.TotalResults == 1 ? string.Empty : "s") found</p>
+        <p id="results-count" class="blog-landing__count" aria-live="polite">@Model.Paging.TotalItems result@(Model.Paging.TotalItems == 1 ? string.Empty : "s") found</p>
 
         <ul class="search-result-list" id="result-list" data-component="result-list" role="list">
             @if (Model.Results.Count == 0)
@@ -100,12 +94,12 @@
             }
         </ul>
 
-        @if (Model.TotalPages > 1)
+        @if (Model.Paging.TotalPages > 1)
         {
             <nav class="pagination" id="pagination-container" aria-label="Pagination">
-                @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                @for (var pageNumber = 1; pageNumber <= Model.Paging.TotalPages; pageNumber++)
                 {
-                    <a class="pagination__page@(pageNumber == Model.CurrentPageNumber ? " is-current" : string.Empty)" href="@BuildSearchUrl(Model.Request.Type, pageNumber)" aria-current="@(pageNumber == Model.CurrentPageNumber ? "page" : null)">@pageNumber</a>
+                    <a class="pagination__page@(pageNumber == Model.Paging.CurrentPage ? " is-current" : string.Empty)" href="@BuildSearchUrl(Model.Request.Type, pageNumber)" aria-current="@(pageNumber == Model.Paging.CurrentPage ? "page" : null)">@pageNumber</a>
                 }
             </nav>
         }

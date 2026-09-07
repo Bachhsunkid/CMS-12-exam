@@ -36,24 +36,16 @@ public class SiteSearchService(IClient client, IUrlResolver urlResolver) : ISite
             .Take(Constants.DefaultSearchPageSize)
             .GetResultAsync(_hitSpec);
 
-        var totalPages = PaginationHelper.GetTotalPages(searchResult.TotalMatching, Constants.DefaultSearchPageSize);
-        var currentPage = PaginationHelper.NormalizePage(request.Page, totalPages);
-
-        if (currentPage != request.Page)
-        {
-            searchResult = await search
-                .Skip(PaginationHelper.GetSkip(currentPage, Constants.DefaultSearchPageSize))
-                .Take(Constants.DefaultSearchPageSize)
-                .GetResultAsync(_hitSpec);
-        }
-
         return new SiteSearchViewModel(searchPage)
         {
             Request = request,
             Results = searchResult.Select(MapResult).ToList(),
-            TotalResults = searchResult.TotalMatching,
-            CurrentPageNumber = currentPage,
-            TotalPages = totalPages
+            Paging = new PagingViewModelBase
+            {
+                CurrentPage = request.Page,
+                PageSize = Constants.DefaultSearchPageSize,
+                TotalItems = searchResult.TotalMatching
+            }
         };
     }
 

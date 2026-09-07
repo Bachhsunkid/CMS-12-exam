@@ -12,7 +12,5 @@ public class SiteSearchViewModel : PageViewModel<SiteSearchPage>
     public SiteSearchPage Page { get; init; }
     public required SiteSearchRequest Request { get; init; }
     public required IReadOnlyList<SiteSearchResultItem> Results { get; init; }
-    public required int TotalResults { get; init; }
-    public required int CurrentPageNumber { get; init; }
-    public required int TotalPages { get; init; }
+    public required PagingViewModelBase Paging { get; init; }
 }

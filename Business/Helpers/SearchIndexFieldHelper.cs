@@ -19,19 +19,6 @@ public static class SearchIndexFieldHelper
         return post.MainBody.StripHtml();
     }
 
-    public static int GetAgeInDays(this BlogPostPage post)
-    {
-        // Uses the same local CMS time convention as publishing and seed data.
-        if (post.PublishDate is null)
-        {
-            return 0;
-        }
-
-        return Math.Max(0, (int)Math.Floor((DateTime.Now - post.PublishDate.Value).TotalDays));
-    }
-    
-    
-    
     private static string StripHtml(this XhtmlString? xhtmlString)
     {
         if (xhtmlString is null || xhtmlString.IsEmpty)
