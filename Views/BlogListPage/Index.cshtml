@@ -136,11 +136,11 @@
                                     </p>
                                     @if (!string.IsNullOrWhiteSpace(item.AuthorUrl))
                                     {
-                                        <a class="teaser__author" href="@item.AuthorUrl">@post.Author</a>
+                                        <a class="teaser__author" href="@item.AuthorUrl">@item.AuthorName</a>
                                     }
                                     else
                                     {
-                                        <span class="teaser__author">@post.Author</span>
+                                        <span class="teaser__author">@item.AuthorName</span>
                                     }
                                 </div>
                             </article>

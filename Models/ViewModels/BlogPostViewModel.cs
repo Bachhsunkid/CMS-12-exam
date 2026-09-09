@@ -12,5 +12,6 @@ public class BlogPostViewModel : PageViewModel<BlogPostPage>
     public BlogPostPage BlogPost { get; init; }
     public required int ReadingTimeMinutes { get; init; }
     public string? HeroImageUrl { get; init; }
+    public string? AuthorName { get; init; }
     public string? AuthorUrl { get; init; }
 }

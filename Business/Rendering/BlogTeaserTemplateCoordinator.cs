@@ -11,15 +11,9 @@ public class BlogTeaserTemplateCoordinator : IViewTemplateModelRegistrator
     {
         templates.Add(typeof(BlogTeaserBlock), new TemplateModel
         {
-            Name = "BlogTeaserBlockAutomatic",
-            Path = "~/Views/Shared/Blocks/BlogTeaserBlock.cshtml"
-        });
-        
-        templates.Add(typeof(BlogTeaserBlock), new TemplateModel
-        {
             Name = "BlogTeaserBlockDefault",
             Tags = [Globals.Layouts.FullWidth, Globals.Layouts.HalfWidth],
-            AvailableWithoutTag = false,
+            AvailableWithoutTag = true,
             Path = "~/Views/Shared/Blocks/BlogTeaserBlock.cshtml"
         });
 

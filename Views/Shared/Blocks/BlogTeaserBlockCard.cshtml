@@ -7,7 +7,8 @@
      && !ContentReference.IsNullOrEmpty(postReference)
      && ContentLoader.TryGet<BlogPostPage>(postReference, out var post))
 {
-    var authorUrl = await AuthorService.GetUrl(post);
+    var authorUrl = AuthorService.GetUrl(post);
+    var author = AuthorService.GetByReference(post.AuthorRef);
     <article class="teaser teaser--card">
         @if (!ContentReference.IsNullOrEmpty(post.HeroImage))
         {
@@ -29,11 +30,11 @@
             </p>
             @if (!string.IsNullOrWhiteSpace(authorUrl))
             {
-                <a class="teaser__author" href="@authorUrl">@post.Author</a>
+                <a class="teaser__author" href="@authorUrl">@author?.FullName</a>
             }
             else
             {
-                <span class="teaser__author">@post.Author</span>
+                <span class="teaser__author">@author?.FullName</span>
             }
         </div>
     </article>

@@ -1,9 +1,9 @@
-using System.Text.RegularExpressions;
 using EPiServer.Find;
 using EPiServer.Find.Cms;
 using EPiServer.Globalization;
 using EPiServer.Web;
 using EPiServer.Web.Routing;
+using TrainingTest.Business.Helpers;
 using TrainingTest.Business.Resolvers;
 using TrainingTest.Models.Blocks;
 using TrainingTest.Models.Pages;
@@ -36,24 +36,29 @@ public class AuthorService(
         return result.FirstOrDefault();
     }
 
+    public AuthorProfileBlock? GetByReference(ContentReference? authorReference)
+    {
+        return ContentReference.IsNullOrEmpty(authorReference) ||
+               !contentLoader.TryGet(authorReference, out AuthorProfileBlock? author)
+            ? null
+            : author;
+    }
+
     public async Task<IContentResult<BlogPostPage>> GetPosts(
         BlogListPage blog,
         AuthorProfileBlock author,
         int pageNumber,
         int pageSize)
     {
-        if (string.IsNullOrWhiteSpace(author.FullName) || author.FullName is null)
-        {
-            return new ContentResult<BlogPostPage>(null, null);
-        }
+        var searchNow = SearchQueryCacheHelper.GetSearchNow();
 
         var matchPost = await client
             .Search<BlogPostPage>()
             .FilterOnCurrentSite()
             .FilterForVisitor()
             .Filter(post => post.ParentLink.ID.Match(blog.ContentLink.ID))
-            .Filter(post => post.Author.Match(author.FullName.Trim()))
-            .Filter(post => post.PublishDate.InRange(DateTime.MinValue, DateTime.Now))
+            .Filter(post => post.AuthorRef!.ID.Match(((IContent)author).ContentLink.ID))
+            .Filter(post => post.PublishDate.Before(searchNow))
             .OrderByDescending(post => post.PublishDate)
             .ThenByDescending(post => post.Changed)
             .Skip((pageNumber - 1) * pageSize)
@@ -63,7 +68,7 @@ public class AuthorService(
         return matchPost;
     }
 
-    public async Task<string?> GetUrl(BlogPostPage post)
+    public string? GetUrl(BlogPostPage post)
     {
         var blog = contentLoader.Get<BlogListPage>(post.ParentLink);
         if (blog is null)
@@ -71,52 +76,36 @@ public class AuthorService(
             return null;
         }
         
-        if (post.Author is null || !TryGetAuthorProfileFolder(out var authorProfileFolder))
-        {
-            return null;
-        }
-
-        var result = await client
-            .Search<AuthorProfileBlock>()
-            .Filter(profile => ((IContent)profile).ParentLink.ID.Match(authorProfileFolder.ID))
-            .Filter(profile => profile.FullName.Match(post.Author.Trim()))
-            .Take(1)
-            .GetContentResultAsync();
-
-        var author = result.FirstOrDefault();
-
+        var author = GetByReference(post.AuthorRef);
         return author is null ? null : GetPartialUrl(blog, author);
     }
 
-    public async Task<Dictionary<string, string>> GetUrls(BlogListPage blog, List<string> authorNames)
+    public Dictionary<int, AuthorReferenceDetails> GetUrls(BlogListPage blog, IEnumerable<ContentReference> authorReferences)
     {
-        var normalizedAuthorNames = authorNames
-            .Select(name => name.Trim())
-            .Distinct()
+        var uniqueAuthorReferences = authorReferences
+            .Where(reference => !ContentReference.IsNullOrEmpty(reference))
+            .GroupBy(reference => reference.ID)
+            .Select(group => group.First())
             .ToList();
 
-        if (normalizedAuthorNames.Count == 0 || !TryGetAuthorProfileFolder(out var authorProfileFolder))
+        if (uniqueAuthorReferences.Count == 0)
         {
-            return [];
+            return new Dictionary<int, AuthorReferenceDetails>();
         }
 
-        var authorProfileBlocks = await client
-            .Search<AuthorProfileBlock>()
-            .Filter(profile => ((IContent)profile).ParentLink.ID.Match(authorProfileFolder.ID))
-            .Filter(profile => profile.FullName.In(normalizedAuthorNames))
-            .GetContentResultAsync();
+        var authors = contentLoader
+            .GetItems(uniqueAuthorReferences, new LoaderOptions())
+            .OfType<AuthorProfileBlock>();
 
-        var urls = new Dictionary<string, string>();
-        foreach (var author in authorProfileBlocks)
-        {
-            var url = GetPartialUrl(blog, author);
-            if (!string.IsNullOrEmpty(url) && !string.IsNullOrWhiteSpace(author.FullName))
-            {
-                urls[author.FullName] = url;
-            }
-        }
+        var details = authors
+            .GroupBy(author => ((IContent)author).ContentLink.ID)
+            .ToDictionary(
+                group => group.Key,
+                group => new AuthorReferenceDetails(
+                    group.First().FullName,
+                    GetPartialUrl(blog, group.First())));
 
-        return urls;
+        return details;
     }
 
     public async Task<string?> GetFirstAuthorUrl(BlogListPage blog)

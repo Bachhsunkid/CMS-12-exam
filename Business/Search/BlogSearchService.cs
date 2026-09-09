@@ -35,7 +35,7 @@ public class BlogSearchService(
             var posts = await postsTask;
             var facets = await facetsTask;
 
-            return await MapToViewModel(blog, request, request.Page, pageSize, posts, facets);
+            return MapToViewModel(blog, request, request.Page, pageSize, posts, facets);
         }
         catch (Exception ex)
         {
@@ -134,26 +134,26 @@ public class BlogSearchService(
 
     private static string PeriodFacetKey(int days) => $"period-{days}";
 
-    private async Task<BlogSearchViewModel> MapToViewModel(
+    private BlogSearchViewModel MapToViewModel(
         BlogListPage blog, BlogSearchRequest request, int page, int pageSize,
         IContentResult<BlogPostPage> posts, BlogFacetResults facets)
     {
-        var authorNames = posts
-            .Select(p => p.Author)
-            .Where(a => !string.IsNullOrWhiteSpace(a)).Distinct()
+        var authorReferences = posts
+            .Select(post => post.AuthorRef)
+            .Where(author => !ContentReference.IsNullOrEmpty(author))
+            .Select(author => author!)
             .ToList();
-
-        var authorUrls = await authorService.GetUrls(blog, authorNames!);
+        var authors = authorService.GetUrls(blog, authorReferences);
 
         return new(blog)
         {
             Request = request,
             TagFacets = facets.Tags,
             PeriodFacets = facets.Periods,
-            Posts = posts.Select(post => new BlogPostListItemViewModel
+            Posts = posts.Select(post =>
             {
-                Post = post,
-                AuthorUrl = authorUrls.TryGetValue(post.Author ?? string.Empty, out var url) ? url : null
+                var author = post.AuthorRef is null ? null : authors.GetValueOrDefault(post.AuthorRef.ID);
+                return new BlogPostListItemViewModel(post, author?.Name, author?.Url);
             }).ToList(),
             Paging = new PagingViewModelBase
             {
@@ -169,13 +169,12 @@ public class BlogSearchService(
         return result
             .TermsFacetFor(p => p.Tags).Terms
             .OrderBy(facet => facet.Term)
-            .Select(facet => new BlogSearchFacetOption
+            .Select(facet =>
             {
-                Value = facet.Term,
-                Label = facet.Term,
-                Count = facet.Count,
-                IsSelected = string.Equals(selectedTag, facet.Term, StringComparison.OrdinalIgnoreCase)
-            }).ToList();
+                var isSelected = string.Equals(selectedTag, facet.Term, StringComparison.OrdinalIgnoreCase);
+                return new BlogSearchFacetOption(facet.Term, facet.Term, facet.Count, isSelected);
+            })
+            .ToList();
     }
 
     private static IReadOnlyList<BlogSearchFacetOption> BuildPeriodFacets(
@@ -183,18 +182,15 @@ public class BlogSearchService(
         int? selectedPeriodDays)
     {
         var options = Constants.Periods
-            .Select(period => new BlogSearchFacetOption
+            .Select(period =>
             {
-                Value = period.Days.ToString(),
-                Label = period.Label,
-                Count = result.FilterFacet(PeriodFacetKey(period.Days)).Count,
-                IsSelected = selectedPeriodDays == period.Days
+                var count = result.FilterFacet(PeriodFacetKey(period.Days)).Count;
+                var isSelected = selectedPeriodDays == period.Days;
+                return new BlogSearchFacetOption(period.Days.ToString(), period.Label, count, isSelected);
+
             }).ToList();
-        options.Add(new BlogSearchFacetOption
-        {
-            Value = "all", Label = "All time", Count = result.TotalMatching,
-            IsSelected = !selectedPeriodDays.HasValue
-        });
+
+        options.Add(new BlogSearchFacetOption(Value: "all", Label: "All time", Count: result.TotalMatching, IsSelected: !selectedPeriodDays.HasValue));
         return options;
     }
 

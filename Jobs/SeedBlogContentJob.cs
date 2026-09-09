@@ -221,7 +221,7 @@ public class SeedBlogContentJob : ScheduledJobBase
                 post.Summary = seed.Summary;
                 post.MainBody = new XhtmlString($"<p>{seed.Summary}</p><p>{seed.Body}</p>");
                 post.PublishDate = now.AddDays(seed.PublishOffsetDays);
-                post.Author = author.FullName;
+                post.AuthorRef = AsContent(author).ContentLink;
                 post.Tags = seed.Tags;
                 _contentRepository.Save(post, SaveAction.Publish, AccessLevel.NoAccess);
                 result.PostsCreated++;
@@ -232,6 +232,25 @@ public class SeedBlogContentJob : ScheduledJobBase
                 result.Messages.Add($"{seed.RouteSegment}: {exception.Message}");
             }
         }
+    }
+
+    // one time migration to populate the AuthorRef from the author slug on existing posts
+    private void MigrateAuthorReference(
+        BlogPostPage post,
+        string authorSlug,
+        IReadOnlyDictionary<string, AuthorProfileBlock> authors,
+        BlogContentSeedResult result)
+    {
+        if (!ContentReference.IsNullOrEmpty(post.AuthorRef) ||
+            !authors.TryGetValue(authorSlug, out var author))
+        {
+            return;
+        }
+
+        var writablePost = (BlogPostPage)post.CreateWritableClone();
+        writablePost.AuthorRef = AsContent(author).ContentLink;
+        _contentRepository.Save(writablePost, SaveAction.Publish, AccessLevel.NoAccess);
+        result.Messages.Add($"{post.URLSegment}: author reference migrated.");
     }
 
     private void UpdateAuthorPostCounts(ContentReference folderLink, ContentReference blogListLink, BlogContentSeedResult result)
@@ -248,7 +267,7 @@ public class SeedBlogContentJob : ScheduledJobBase
                 return;
             }
 
-            var count = posts.Count(post => string.Equals(post.Author, author.FullName, StringComparison.OrdinalIgnoreCase));
+            var count = posts.Count(post => post.AuthorRef?.ID == AsContent(author).ContentLink.ID);
             if (author.PostCount == count)
             {
                 continue;

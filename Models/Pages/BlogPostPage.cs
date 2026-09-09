@@ -50,11 +50,12 @@ public class BlogPostPage : SitePageData
     public virtual DateTime? PublishDate { get; set; }
 
     [CultureSpecific]
-    [Required(AllowEmptyStrings = false)]
+    [Required]
+    [AllowedTypes(typeof(Blocks.AuthorProfileBlock))]
     [Display(Name = "Author", 
         GroupName = Globals.GroupNames.Publishing, 
         Order = 20)]
-    public virtual string? Author { get; set; } // how to migrate to ContentReference
+    public virtual ContentReference? AuthorRef { get; set; }
 
     [CultureSpecific]
     [BackingType(typeof(PropertyStringList))]

@@ -7,7 +7,7 @@ namespace TrainingTest.Business.Models;
 /// <summary>
 /// Represents the Blog List query-string state.
 /// </summary>
-public class BlogSearchRequest
+public record BlogSearchRequest
 {
     [FromQuery(Name = "q")]
     public string Query { get; set; } = string.Empty;

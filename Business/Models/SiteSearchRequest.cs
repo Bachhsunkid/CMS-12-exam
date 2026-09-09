@@ -4,7 +4,7 @@ using TrainingTest.Business.Models.Enums;
 
 namespace TrainingTest.Business.Models;
 
-public class SiteSearchRequest
+public record SiteSearchRequest
 {
     [FromQuery(Name = "q")]
     public string Query { get; init; } = string.Empty;
