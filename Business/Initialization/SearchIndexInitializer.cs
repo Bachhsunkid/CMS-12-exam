@@ -6,6 +6,7 @@ using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
 using EPiServer.Web;
 using TrainingTest.Business.Helpers;
+using TrainingTest.Models.Blocks;
 using TrainingTest.Models.Media;
 using TrainingTest.Models.Pages;
 
@@ -13,8 +14,8 @@ namespace TrainingTest.Business.Initialization;
 
 /// <summary>
 /// Applies the blog's Search & Navigation conventions once CMS and Find services are available.
-/// See https://docs.developers.optimizely.com/content-management-system/v1.1.0-search-and-navigation/docs/index-integrated-solution.
-/// and https://docs.developers.optimizely.com/content-management-system/v1.1.0-search-and-navigation/docs/including-fields.
+/// See https://docs.developers.optimizely.com/content-management-system/v1.1.0-search-and-navigation/docs/index-integrated-solution
+/// and https://docs.developers.optimizely.com/content-management-system/v1.1.0-search-and-navigation/docs/including-fields
 /// </summary>
 [InitializableModule]
 [ModuleDependency(typeof(InitializationModule))]
@@ -30,7 +31,6 @@ public class SearchIndexInitializer : IInitializableModule
         client.Conventions.ForInstancesOf<BlogPostPage>()
             .IncludeField(post => post.GetReadingTimeMinutes())
             .IncludeField(post => post.GetSearchableMainBody())
-            .IncludeField(post => post.GetAgeInDays())
             .ExcludeField(post => post.InternalNotes);
 
         // A published post is not searchable until its editorial publish date is reached.

@@ -3,6 +3,8 @@ using EPiServer.Shell.Security;
 using EPiServer.Web.Mvc;
 using EPiServer.Web.Routing;
 using Microsoft.AspNetCore.Mvc;
+using TrainingTest.Business;
+using TrainingTest.Business.Models;
 using TrainingTest.Business.Resolvers;
 using TrainingTest.Models.Pages;
 
@@ -12,16 +14,11 @@ namespace TrainingTest.Controllers;
 /// All controllers that renders pages should inherit from this class so that we can
 /// apply action filters, such as for output caching site wide, should we want to.
 /// </summary>
-public abstract class PageControllerBase<T> : PageController<T>
+public abstract class PageControllerBase<T> : PageController<T>, IModifyLayout
     where T : SitePageData
 {
     protected readonly Injected<UISignInManager> UISignInManager;
     protected readonly Injected<IPageLayoutResolver> PageLayoutResolver;
-
-    protected void SetPageLayout(SitePageData page)
-    {
-        ViewData["PageLayout"] = PageLayoutResolver.Service.Resolve(page);
-    }
 
     /// <summary>
     /// Signs out the current user and redirects to the Index action of the same controller.
@@ -35,6 +32,16 @@ public abstract class PageControllerBase<T> : PageController<T>
     public async Task<IActionResult> Logout()
     {
         await UISignInManager.Service.SignOutAsync();
-        return Redirect(HttpContext.RequestServices.GetService<UrlResolver>()!.GetUrl(PageContext.ContentLink, PageContext.LanguageID));
+        return Redirect(HttpContext.RequestServices.GetService<IUrlResolver>()!.GetUrl(PageContext.ContentLink, PageContext.LanguageID));
+    }
+
+    public void ModifyLayout(LayoutModel layoutModel)
+    {
+        var page = PageContext.Page as SitePageData;
+        if (page != null)
+        {
+            layoutModel.Header = PageLayoutResolver.Service.ResolveHeader(page);
+            layoutModel.Footer = PageLayoutResolver.Service.ResolveFooter(page);
+        }
     }
 }

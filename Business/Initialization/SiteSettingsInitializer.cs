@@ -39,7 +39,7 @@ public class SiteSettingsInitializer : IInitializableModule
     {
         foreach (var site in _siteDefinitionRepository!.List())
         {
-            if (!HasStartPage(_contentLoader!, site.StartPage))
+            if (!IsExistedStartPageInstance(_contentLoader!, site.StartPage))
             {
                 continue;
             }
@@ -58,7 +58,7 @@ public class SiteSettingsInitializer : IInitializableModule
         }
     }
 
-    private static bool HasStartPage(IContentLoader contentLoader, ContentReference startPage)
+    private static bool IsExistedStartPageInstance(IContentLoader contentLoader, ContentReference startPage)
     {
         if (ContentReference.IsNullOrEmpty(startPage))
         {

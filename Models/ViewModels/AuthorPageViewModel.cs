@@ -3,11 +3,15 @@ using TrainingTest.Models.Pages;
 
 namespace TrainingTest.Models.ViewModels;
 
-public class AuthorPageViewModel
+public class AuthorPageViewModel : PageViewModel<BlogListPage>
 {
-    public required BlogListPage Blog { get; init; }
+    public AuthorPageViewModel(BlogListPage currentPage) : base(currentPage)
+    {
+        Blog = currentPage;
+    }
+
+    public BlogListPage Blog { get; init; }
     public required AuthorProfileBlock Author { get; init; }
     public required IReadOnlyList<BlogPostPage> Posts { get; init; }
-    public required int CurrentPageNumber { get; init; }
-    public required int TotalPages { get; init; }
+    public required PagingViewModelBase Paging { get; init; } 
 }

@@ -7,20 +7,19 @@ using TrainingTest.Models.ViewModels;
 
 namespace TrainingTest.Controllers;
 
-public class BlogPostPageController(UrlResolver urlResolver, IAuthorService authorService) : PageControllerBase<BlogPostPage>
+public class BlogPostPageController(IUrlResolver urlResolver, IAuthorService authorService) : PageControllerBase<BlogPostPage>
 {
     public IActionResult Index(BlogPostPage currentPage)
     {
-        ViewData["PageCss"] = "/blog-post-page.css";
-        SetPageLayout(currentPage);
-        
-        return View(new BlogPostViewModel
+        var author = authorService.GetByReference(currentPage.AuthorRef);
+
+        return View(new BlogPostViewModel(currentPage)
         {
-            BlogPost = currentPage,
             ReadingTimeMinutes = currentPage.MainBody.EstimateReadingTime(),
             HeroImageUrl = ContentReference.IsNullOrEmpty(currentPage.HeroImage)
                 ? null
                 : urlResolver.GetUrl(currentPage.HeroImage),
+            AuthorName = author?.FullName,
             AuthorUrl = authorService.GetUrl(currentPage)
         });
     }

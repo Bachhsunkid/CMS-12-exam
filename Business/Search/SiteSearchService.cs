@@ -16,7 +16,7 @@ namespace TrainingTest.Business.Search;
 /// See https://docs.developers.optimizely.com/content-management-system/v1.1.0-search-and-navigation/docs/unified-search
 /// and https://docs.developers.optimizely.com/content-management-system/v1.1.0-search-and-navigation/docs/boosting-with-weights
 /// </summary>
-public class SiteSearchService(IClient client, UrlResolver urlResolver) : ISiteSearchService
+public class SiteSearchService(IClient client, IUrlResolver urlResolver) : ISiteSearchService
 {
     private readonly HitSpecification _hitSpec = new HitSpecification
     {
@@ -31,30 +31,22 @@ public class SiteSearchService(IClient client, UrlResolver urlResolver) : ISiteS
 
         search = ApplyTypeFilter(search, request.Type);
 
+        var pageSize = Constants.DefaultSearchPageSize;
         var searchResult = await search
-            .Skip(PaginationHelper.GetSkip(request.Page, Constants.DefaultSearchPageSize))
-            .Take(Constants.DefaultSearchPageSize)
+            .Skip((request.Page - 1) * pageSize)
+            .Take(pageSize)
             .GetResultAsync(_hitSpec);
 
-        var totalPages = PaginationHelper.GetTotalPages(searchResult.TotalMatching, Constants.DefaultSearchPageSize);
-        var currentPage = PaginationHelper.NormalizePage(request.Page, totalPages);
-
-        if (currentPage != request.Page)
+        return new SiteSearchViewModel(searchPage)
         {
-            searchResult = await search
-                .Skip(PaginationHelper.GetSkip(currentPage, Constants.DefaultSearchPageSize))
-                .Take(Constants.DefaultSearchPageSize)
-                .GetResultAsync(_hitSpec);
-        }
-
-        return new SiteSearchViewModel
-        {
-            Page = searchPage,
             Request = request,
             Results = searchResult.Select(MapResult).ToList(),
-            TotalResults = searchResult.TotalMatching,
-            CurrentPageNumber = currentPage,
-            TotalPages = totalPages
+            Paging = new PagingViewModelBase
+            {
+                CurrentPage = request.Page,
+                PageSize = pageSize,
+                TotalItems = searchResult.TotalMatching
+            }
         };
     }
 

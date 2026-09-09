@@ -11,9 +11,10 @@ public static class TinyMceConfigurationExtensions
         // Reference: https://docs.developers.optimizely.com/content-management-system/docs/configuration-api
         services.Configure<TinyMceConfiguration>(configuration =>
         {
-            configuration.For<BlogPostPage>(page => page.MainBody)
+            configuration
+                .Default()
                 .ContentCss("/blog-post-page.css")
-                .AppendToolbar("styles", 0)
+                .AppendToolbar("styles")
                 .StyleFormats(
                     new { title = "Primary Button", selector = "a", attributes = new { @class = "btn btn-primary" } },
                     new { title = "Secondary Button", selector = "a", attributes = new { @class = "btn btn-secondary" } },

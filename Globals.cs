@@ -31,7 +31,7 @@ public class Globals
         [Display(Name = "Contact", Order = 70)]
         public const string Contact = "Contact";
 
-        [Display(Name = "SiteSettings", Order = 80)]
+        [Display(Name = "Site Settings", Order = 80)]
         public const string SiteSettings = "SiteSettings";
 
         [Display(Name = "Header and footer", Order = 85)]

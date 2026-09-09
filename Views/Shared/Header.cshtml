@@ -4,12 +4,15 @@
     <div class="container site-header__inner">
         <a class="site-header__logo" href="@(Model.LogoLink?.ToString() ?? "/")">@Model.LogoText</a>
         <nav class="site-header__nav" aria-label="Primary">
-            <ul role="list">
-                @foreach (var link in Model.NavigationLinks ?? [])
-                {
-                    <li>@Html.ContentLink(link)</li>
-                }
-            </ul>
+            @if (Model.NewNavigationLinks is not null)
+            {
+                <ul class="site-footer__links" role="list">
+                    @foreach (var item in Model.NewNavigationLinks.FilteredItems)
+                    {
+                        <li>@Html.ContentLink(item.ContentLink)</li>
+                    }
+                </ul>
+            }
         </nav>
     </div>
 </header>

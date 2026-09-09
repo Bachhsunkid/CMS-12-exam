@@ -2,9 +2,11 @@ using EPiServer.Web;
 using EPiServer.Web.Routing;
 using EPiServer.Web.Routing.Matching;
 using Microsoft.AspNetCore.Mvc;
+using TrainingTest.Business;
 using TrainingTest.Business.Authoring;
-using TrainingTest.Business.Helpers;
+using TrainingTest.Business.Models;
 using TrainingTest.Business.Resolvers;
+using TrainingTest.Models.Pages;
 using TrainingTest.Models.ViewModels;
 
 namespace TrainingTest.Controllers;
@@ -16,9 +18,9 @@ namespace TrainingTest.Controllers;
 public class AuthorPageController(
     IAuthorService authorService,
     IPageLayoutResolver pageLayoutResolver,
-    UrlResolver urlResolver) : Controller, IRenderTemplate<AuthorRouteData>
+    IUrlResolver urlResolver) : Controller, IRenderTemplate<AuthorRouteData>, IModifyLayout
 {
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         var routeData = HttpContext.Features.Get<IContentRouteFeature>()?.RoutedContentData.PartialRoutedObject as AuthorRouteData;
         if (routeData is null)
@@ -26,43 +28,49 @@ public class AuthorPageController(
             return NotFound();
         }
 
-        var author = authorService.GetBySlug(routeData.Slug);
+        var author = await authorService.GetBySlug(routeData.Slug);
         if (author is null)
         {
             return RenderNotFound(routeData.Blog);
         }
 
-        var posts = authorService.GetPosts(routeData.Blog, author);
-        var totalPages = PaginationHelper.GetTotalPages(posts.Count, Constants.DefaultPageSize);
-        var currentPage = PaginationHelper.NormalizePage(routeData.PageNumber, totalPages);
+        var pageSize = Constants.DefaultPageSize;
+        var matchedPost = await authorService
+            .GetPosts(routeData.Blog, author, routeData.PageNumber, pageSize);
 
-        ViewData["Title"] = author.FullName;
-        ViewData["PageCss"] = "/author.css";
-        ViewData["PageLayout"] = pageLayoutResolver.Resolve(routeData.Blog);
-
-        return View(new AuthorPageViewModel
+        return View(new AuthorPageViewModel(routeData.Blog)
         {
-            Blog = routeData.Blog,
             Author = author,
-            Posts = posts
-                .Skip(PaginationHelper.GetSkip(currentPage, Constants.DefaultPageSize))
-                .Take(Constants.DefaultPageSize)
-                .ToList(),
-            CurrentPageNumber = currentPage,
-            TotalPages = totalPages
+            Posts = matchedPost.Items.ToList(),
+            Paging = new PagingViewModelBase
+            {
+                CurrentPage = routeData.PageNumber,
+                PageSize = pageSize,
+                TotalItems = matchedPost.TotalMatching
+            }
         });
     }
 
-    private ViewResult RenderNotFound(Models.Pages.BlogListPage blog)
+    private ViewResult RenderNotFound(BlogListPage blog)
     {
         Response.StatusCode = StatusCodes.Status404NotFound;
-        ViewData["Title"] = "Page not found";
-        ViewData["PageCss"] = "/not-found.css";
-        ViewData["PageLayout"] = pageLayoutResolver.Resolve(blog);
 
-        return View("~/Views/Shared/NotFound.cshtml", new NotFoundViewModel
+        return View("~/Views/Shared/NotFound.cshtml", new NotFoundViewModel(blog)
         {
             BlogUrl = urlResolver.GetUrl(blog.ContentLink)
         });
+    }
+
+    public void ModifyLayout(LayoutModel layoutModel)
+    {
+        var routeData = HttpContext.Features.Get<IContentRouteFeature>()?.RoutedContentData.PartialRoutedObject as AuthorRouteData;
+        var blog = routeData?.Blog;
+        if (blog is null)
+        {
+            return;
+        }
+
+        layoutModel.Header = pageLayoutResolver.ResolveHeader(blog);
+        layoutModel.Footer = pageLayoutResolver.ResolveFooter(blog);
     }
 }

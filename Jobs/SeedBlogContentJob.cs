@@ -1,5 +1,5 @@
-using System.Globalization;
 using EPiServer.DataAccess;
+using EPiServer.Globalization;
 using EPiServer.PlugIn;
 using EPiServer.Scheduler;
 using EPiServer.Security;
@@ -89,7 +89,7 @@ public class SeedBlogContentJob : ScheduledJobBase
     private void SeedSite(SiteDefinition site, BlogSeedData seedData, DateTime now, BlogContentSeedResult result)
     {
         // A missing settings page or Blog List is configuration to fix, not content this job should create.
-        var settings = _siteSettingsResolver.Get(site, CultureInfo.CurrentUICulture);
+        var settings = _siteSettingsResolver.Get(site, ContentLanguage.PreferredCulture);
         if (settings is null)
         {
             result.Messages.Add($"{site.Name}: Site settings were not found; no content was seeded.");
@@ -119,7 +119,8 @@ public class SeedBlogContentJob : ScheduledJobBase
         // The author folder is the one seed-owned prerequisite; its reference is persisted on Site Settings.
         // Reference: https://docs.developers.optimizely.com/content-management-system/docs/creating-and-editing-content
         if (!ContentReference.IsNullOrEmpty(settings.AuthorProfileFolder) &&
-            _contentLoader.TryGet(settings.AuthorProfileFolder, out ContentFolder? folder))
+            _contentLoader.TryGet(settings.AuthorProfileFolder, out ContentFolder? folder) &&
+            folder is not null)
         {
             return folder;
         }
@@ -130,7 +131,7 @@ public class SeedBlogContentJob : ScheduledJobBase
             return null;
         }
 
-        var newFolder = _contentRepository.GetDefault<ContentFolder>(settings.ParentLink);
+        var newFolder = _contentRepository.GetDefault<ContentFolder>(ContentReference.GlobalBlockFolder);
         newFolder.Name = "Author profiles";
         var folderReference = _contentRepository.Save(newFolder, SaveAction.Publish, AccessLevel.NoAccess);
 
@@ -220,7 +221,7 @@ public class SeedBlogContentJob : ScheduledJobBase
                 post.Summary = seed.Summary;
                 post.MainBody = new XhtmlString($"<p>{seed.Summary}</p><p>{seed.Body}</p>");
                 post.PublishDate = now.AddDays(seed.PublishOffsetDays);
-                post.Author = author.FullName;
+                post.AuthorRef = AsContent(author).ContentLink;
                 post.Tags = seed.Tags;
                 _contentRepository.Save(post, SaveAction.Publish, AccessLevel.NoAccess);
                 result.PostsCreated++;
@@ -231,6 +232,25 @@ public class SeedBlogContentJob : ScheduledJobBase
                 result.Messages.Add($"{seed.RouteSegment}: {exception.Message}");
             }
         }
+    }
+
+    // one time migration to populate the AuthorRef from the author slug on existing posts
+    private void MigrateAuthorReference(
+        BlogPostPage post,
+        string authorSlug,
+        IReadOnlyDictionary<string, AuthorProfileBlock> authors,
+        BlogContentSeedResult result)
+    {
+        if (!ContentReference.IsNullOrEmpty(post.AuthorRef) ||
+            !authors.TryGetValue(authorSlug, out var author))
+        {
+            return;
+        }
+
+        var writablePost = (BlogPostPage)post.CreateWritableClone();
+        writablePost.AuthorRef = AsContent(author).ContentLink;
+        _contentRepository.Save(writablePost, SaveAction.Publish, AccessLevel.NoAccess);
+        result.Messages.Add($"{post.URLSegment}: author reference migrated.");
     }
 
     private void UpdateAuthorPostCounts(ContentReference folderLink, ContentReference blogListLink, BlogContentSeedResult result)
@@ -247,7 +267,7 @@ public class SeedBlogContentJob : ScheduledJobBase
                 return;
             }
 
-            var count = posts.Count(post => string.Equals(post.Author, author.FullName, StringComparison.OrdinalIgnoreCase));
+            var count = posts.Count(post => post.AuthorRef?.ID == AsContent(author).ContentLink.ID);
             if (author.PostCount == count)
             {
                 continue;

@@ -1,24 +1,6 @@
 @model BlogSearchViewModel
-@inject UrlResolver UrlResolver
-@using Microsoft.AspNetCore.WebUtilities
-
-@{
-    var blogListUrl = Url.ContentUrl(Model.Blog.ContentLink);
-
-    string BuildSearchUrl(string? tag, int? periodDays, int page)
-    {
-        var query = new Dictionary<string, string?>();
-
-        if (!string.IsNullOrWhiteSpace(Model.Request.Query)) query["q"] = Model.Request.Query;
-        if (!string.IsNullOrWhiteSpace(tag)) query["tag"] = tag;
-        if (periodDays.HasValue) query["period"] = periodDays.Value.ToString();
-        if (Model.Request.QuickReadsOnly) query["quickreads"] = "1";
-        if (Model.Request.Sort == BlogSearchSort.Newest) query["sort"] = "newest";
-        if (page > 1) query["page"] = page.ToString();
-
-        return QueryHelpers.AddQueryString(blogListUrl, query);
-    }
-}
+@inject IUrlResolver UrlResolver
+@inject ISearchUrlBuilder SearchUrlBuilder
 
 <div class="container">
     <h1>@Model.Blog.Heading</h1>
@@ -47,7 +29,7 @@
                     {
                             <li>
                                 <a class="facet-option@(facet.IsSelected ? " is-selected" : string.Empty)"
-                               href="@BuildSearchUrl(facet.IsSelected ? null : facet.Value, Model.Request.PeriodDays, 1)"
+                               href="@SearchUrlBuilder.GetBlogListSearchUrl(Model, facet.IsSelected ? null : facet.Value, Model.Request.PeriodDays)"
                                aria-current="@(facet.IsSelected ? "true" : null)">
                                 <span class="facet-option__label">@facet.Label</span>
                                 <span class="facet-option__count">@facet.Count</span>
@@ -66,7 +48,7 @@
                     {
                             <li>
                                 <a class="facet-option@(facet.IsSelected ? " is-selected" : string.Empty)"
-                               href="@BuildSearchUrl(Model.Request.Tag, facet.Value == "all" ? null : int.Parse(facet.Value), 1)"
+                               href="@SearchUrlBuilder.GetBlogListSearchUrl(Model, Model.Request.Tag, facet.Value == "all" ? null : int.Parse(facet.Value))"
                                aria-current="@(facet.IsSelected ? "true" : null)">
                                 <span class="facet-option__label">@facet.Label</span>
                                 <span class="facet-option__count">@facet.Count</span>
@@ -78,7 +60,7 @@
             </div>
 
             <label class="search-box__toggle">
-                <input type="checkbox" id="quick-reads-toggle" name="quickreads" value="1"
+                <input type="checkbox" id="quick-reads-toggle" name="quickreads" value="true"
                        form="blog-search-form" checked="@Model.Request.QuickReadsOnly" />
                 Quick reads only (under 3 min)
             </label>
@@ -103,17 +85,23 @@
                 <button class="btn btn-primary" type="submit">Search</button>
             </form>
 
-            <p class="blog-landing__count" id="results-count" aria-live="polite">
-                @Model.TotalPosts post@(Model.TotalPosts == 1 ? string.Empty : "s") found
-            </p>
-
-            @if (Model.Posts.Count == 0)
+            @if (Model.SearchUnavailable)
             {
-                <p class="blog-landing__empty">No posts match your filters.</p>
+                <p class="blog-landing__empty" role="alert">Search is temporarily unavailable. Please try again shortly.</p>
             }
             else
             {
-                <ul class="content-area" id="post-list" data-component="teaser-list" role="list">
+                <p class="blog-landing__count" id="results-count" aria-live="polite">
+                    @Model.Paging.TotalItems post@(Model.Paging.TotalItems == 1 ? string.Empty : "s") found
+                </p>
+
+                @if (Model.Posts.Count == 0)
+                {
+                    <p class="blog-landing__empty">No posts match your filters.</p>
+                }
+                else
+                {
+                    <ul class="content-area" id="post-list" data-component="teaser-list" role="list">
                     @foreach (var item in Model.Posts)
                     {
                         var post = item.Post;
@@ -148,32 +136,33 @@
                                     </p>
                                     @if (!string.IsNullOrWhiteSpace(item.AuthorUrl))
                                     {
-                                        <a class="teaser__author" href="@item.AuthorUrl">@post.Author</a>
+                                        <a class="teaser__author" href="@item.AuthorUrl">@item.AuthorName</a>
                                     }
                                     else
                                     {
-                                        <span class="teaser__author">@post.Author</span>
+                                        <span class="teaser__author">@item.AuthorName</span>
                                     }
                                 </div>
                             </article>
                         </li>
                     }
-                </ul>
+                    </ul>
+                }
             }
 
             <div id="pagination-container">
-                @if (Model.TotalPages > 1)
+                @if (Model.Paging.TotalPages > 1)
                 {
                     <nav class="pagination" aria-label="Pagination">
-                        @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                        @for (var pageNumber = 1; pageNumber <= Model.Paging.TotalPages; pageNumber++)
                         {
-                            if (pageNumber == Model.CurrentPageNumber)
+                            if (pageNumber == Model.Paging.CurrentPage)
                             {
                                 <span class="pagination__page is-current" aria-current="page">@pageNumber</span>
                             }
                             else
                             {
-                                <a class="pagination__page" href="@BuildSearchUrl(Model.Request.Tag, Model.Request.PeriodDays, pageNumber)">@pageNumber</a>
+                                <a class="pagination__page" href="@SearchUrlBuilder.GetBlogListSearchUrl(Model, Model.Request.Tag, Model.Request.PeriodDays, pageNumber)">@pageNumber</a>
                             }
                         }
                     </nav>

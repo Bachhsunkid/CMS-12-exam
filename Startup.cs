@@ -8,6 +8,7 @@ using TrainingTest.Business.Authoring;
 using TrainingTest.Business.Initialization;
 using TrainingTest.Business.Resolvers;
 using TrainingTest.Business.Search;
+using TrainingTest.Extensions;
 
 namespace TrainingTest;
 
@@ -32,6 +33,7 @@ public class Startup
         services
             .AddCmsAspNetIdentity<ApplicationUser>()
             .AddCms()
+            .AddTrainingTest()
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
         
@@ -39,11 +41,10 @@ public class Startup
         services.AddBlogDisplayOptions();
         services.AddBlogTinyMceConfiguration();
 
-        services.AddMemoryCache();
-
         services.AddScoped<IBlogSearchService, BlogSearchService>();
         services.AddScoped<ISiteSearchService, SiteSearchService>();
         services.AddScoped<IAuthorService, AuthorService>();
+        services.AddScoped<ISearchUrlBuilder, SearchUrlBuilder>();
         services.AddSingleton<IPartialRouter, AuthorPartialRouter>();
         services.AddSingleton<IBlogSeedDataProvider, BlogSeedDataProvider>();
         services.AddSingleton<ISiteSettingsResolver, SiteSettingsResolver>();

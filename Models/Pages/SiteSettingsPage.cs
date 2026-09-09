@@ -12,7 +12,7 @@ namespace TrainingTest.Models.Pages;
     AvailableInEditMode = false,
     Order = 2)]
 [AvailableContentTypes(IncludeOn = [typeof(StartPage)])]
-public class SiteSettingsPage : SitePageData
+public class SiteSettingsPage : PageData
 {
     [Required(AllowEmptyStrings = false)]
     [Display(Name = "Site name",
@@ -32,7 +32,6 @@ public class SiteSettingsPage : SitePageData
         Order = 30)]
     public virtual ContentReference? DefaultFooter { get; set; }
 
-    [AllowedTypes(typeof(ContentFolder))]
     [UIHint(UIHint.AssetsFolder)]
     [Display(Name = "Author profile folder",
         GroupName = Globals.GroupNames.SiteSettings,

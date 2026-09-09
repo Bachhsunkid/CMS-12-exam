@@ -8,11 +8,9 @@ namespace TrainingTest.Controllers;
 public class SiteSearchPageController(ISiteSearchService siteSearchService)
     : PageControllerBase<SiteSearchPage>
 {
-    public async Task<IActionResult> Index(SiteSearchPage currentPage)
+    public async Task<IActionResult> Index(SiteSearchPage currentPage, [FromQuery] SiteSearchRequest request)
     {
-        ViewData["PageCss"] = "/site-search.css";
-        SetPageLayout(currentPage);
-
-        return View(await siteSearchService.SearchAsync(currentPage, SiteSearchRequest.Parse(Request.Query)));
+        var siteSearchModel = await siteSearchService.SearchAsync(currentPage, request);
+        return View(siteSearchModel);
     }
 }

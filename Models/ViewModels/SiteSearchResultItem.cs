@@ -2,7 +2,7 @@ using TrainingTest.Business.Models.Enums;
 
 namespace TrainingTest.Models.ViewModels;
 
-public class SiteSearchResultItem
+public record SiteSearchResultItem
 {
     public required SiteSearchType Type { get; init; }
     public required string Title { get; init; }

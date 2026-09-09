@@ -31,7 +31,7 @@ public class NormalizeBlogTagsJob : ScheduledJobBase
         IsStoppable = true;
     }
 
-    // Normalizes every blog post below each Blog List, including posts in nested folders.
+    // Normalizes every blog post below each Blog List
     // Reference: https://docs.developers.optimizely.com/content-management-system/docs/scheduled-jobs
     public override string Execute()
     {
@@ -47,7 +47,7 @@ public class NormalizeBlogTagsJob : ScheduledJobBase
                 continue;
             }
 
-            foreach (var post in GetDescendants<BlogPostPage>(blogList.ContentLink))
+            foreach (var post in _contentLoader.GetChildren<BlogPostPage>(blogList.ContentLink))
             {
                 OnStatusChanged($"Normalizing {post.Name}.");
                 if (_stopSignaled)

@@ -1,9 +1,8 @@
 using EPiServer.Find;
 using EPiServer.Find.Cms;
+using TrainingTest.Business.Authoring;
 using TrainingTest.Business.Helpers;
 using TrainingTest.Business.Models;
-using TrainingTest.Business.Models.Enums;
-using TrainingTest.Business.Authoring;
 using TrainingTest.Models.Pages;
 using TrainingTest.Models.ViewModels;
 
@@ -15,167 +14,187 @@ namespace TrainingTest.Business.Search;
 /// https://docs.developers.optimizely.com/content-management-system/v1.1.0-search-and-navigation/docs/facets
 /// and https://docs.developers.optimizely.com/content-management-system/v1.1.0-search-and-navigation/docs/pagination-skip-and-take
 /// </summary>
-public class BlogSearchService(IClient client, IAuthorService authorService) : IBlogSearchService
+public class BlogSearchService(
+    IClient client,
+    IAuthorService authorService,
+    ILogger<BlogSearchService> logger) : IBlogSearchService
 {
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(1);
+
     public async Task<BlogSearchViewModel> SearchAsync(BlogListPage blog, BlogSearchRequest request)
     {
         var pageSize = blog.PageSize ?? Constants.DefaultPageSize;
-        var blogSearchClient = client.Search<BlogPostPage>();
+        var searchNow = SearchQueryCacheHelper.GetSearchNow();
 
-        var selectedPostsSearch = ApplySelectedFilters(blogSearchClient, blog, request, includeTag: true, includePeriod: true);
-        if (request.Sort == BlogSearchSort.Newest)
+        try
         {
-            selectedPostsSearch = selectedPostsSearch
-                .OrderByDescending(post => post.PublishDate)
-                .ThenByDescending(post => post.Changed);
+            var postsTask = FetchPostsAsync(blog, request, searchNow, request.Page, pageSize);
+            var facetsTask = FetchFacetsAsync(blog, request, searchNow);
+
+            await Task.WhenAll(postsTask, facetsTask);
+            var posts = await postsTask;
+            var facets = await facetsTask;
+
+            return MapToViewModel(blog, request, request.Page, pageSize, posts, facets);
         }
-
-        var selectedPostsTask = selectedPostsSearch
-            .Skip(PaginationHelper.GetSkip(request.Page, pageSize))
-            .Take(pageSize)
-            .GetContentResultAsync();
-
-        // A tag facet must retain every active restriction except the tag itself, otherwise
-        // selecting one tag would hide the useful counts for the other tags.
-        var tagFacetTask = ApplySelectedFilters(blogSearchClient, blog, request, includeTag: false, includePeriod: true)
-            .TermsFacetFor(post => post.Tags, options => options.Size = 100)
-            .Take(0)
-            .GetContentResultAsync();
-
-        // The same rule applies independently to the publish-date facet.
-        var periodFacetTask = AddPeriodFacets(
-                ApplySelectedFilters(blogSearchClient, blog, request, includeTag: true, includePeriod: false))
-            .Take(0)
-            .GetContentResultAsync();
-
-        await Task.WhenAll(selectedPostsTask, tagFacetTask, periodFacetTask);
-
-        var selectedPostsResult = await selectedPostsTask;
-        var tagFacetSearchResult = await tagFacetTask;
-        var periodFacetSearchResult = await periodFacetTask;
-
-        var totalPages = PaginationHelper.GetTotalPages(selectedPostsResult.TotalMatching, pageSize);
-        var currentPage = PaginationHelper.NormalizePage(request.Page, totalPages);
-
-        if (currentPage != request.Page)
+        catch (Exception ex)
         {
-            selectedPostsResult = await ApplySelectedFilters(blogSearchClient, blog, request, includeTag: true, includePeriod: true)
-                .Skip(PaginationHelper.GetSkip(currentPage, pageSize))
-                .Take(pageSize)
-                .GetContentResultAsync();
+            // show a warning in the UI to indicate that search is unavailable
+            logger.LogWarning(ex, "Blog search unavailable for blog {BlogId}.", blog.ContentLink.ID);
+            return BlogSearchViewModel.CreateUnavailableResult(blog, request);
         }
-
-        return new BlogSearchViewModel
-        {
-            Blog = blog,
-            Request = request,
-            Posts = selectedPostsResult.Items
-                .Select(post => new BlogPostListItemViewModel
-                {
-                    Post = post,
-                    AuthorUrl = authorService.GetUrl(blog, post.Author)
-                })
-                .ToList(),
-            TagFacets = tagFacetSearchResult
-                .TermsFacetFor(post => post.Tags)
-                .Terms
-                .OrderByDescending(facet => facet.Count)
-                .ThenBy(facet => facet.Term)
-                .Select(facet => new BlogSearchFacetOption
-                {
-                    Value = facet.Term,
-                    Label = facet.Term,
-                    Count = facet.Count,
-                    IsSelected = string.Equals(request.Tag, facet.Term, StringComparison.OrdinalIgnoreCase)
-                })
-                .ToList(),
-            PeriodFacets = CreatePeriodFacets(periodFacetSearchResult, request.PeriodDays),
-            CurrentPageNumber = currentPage,
-            PageSize = pageSize,
-            TotalPosts = selectedPostsResult.TotalMatching,
-            TotalPages = totalPages
-        };
     }
 
-    private static ITypeSearch<BlogPostPage> ApplySelectedFilters(
-        ITypeSearch<BlogPostPage> query,
-        BlogListPage blog,
-        BlogSearchRequest request,
-        bool includeTag,
-        bool includePeriod)
+    private Task<IContentResult<BlogPostPage>> FetchPostsAsync(
+        BlogListPage blog, BlogSearchRequest request, DateTime searchNow, int page, int pageSize)
+    {
+        var query = client.Search<BlogPostPage>();
+
+        // var test = BaseQuery(query, blog, request, searchNow)
+        //     .WithTag(request.Tag)
+        //     .WithPeriod(request.PeriodDays, searchNow)
+        //     .WithSort(request.Sort)
+        //     .TermsFacetFor(p => p.Tags, command => command.Size = Constants.TagFacetSize)
+        //     .FilterFacet(Constants.Periods[0].Label, p => p.PublishDate.InRange(searchNow.AddDays(-Constants.Periods[0].Days), searchNow))
+        //     .FilterFacet(Constants.Periods[1].Label, p => p.PublishDate.InRange(searchNow.AddDays(-Constants.Periods[1].Days), searchNow))
+        //     .FilterFacet(Constants.Periods[2].Label, p => p.PublishDate.InRange(searchNow.AddDays(-Constants.Periods[2].Days), searchNow))
+        //     .FilterFacet("all", p => p.PublishDate.Before(searchNow))
+        //     .Skip((page - 1) * pageSize)
+        //     .Take(pageSize) // default is 10, maximum is 1000
+        //     .GetContentResultAsync().Result;
+
+        return BaseQuery(query, blog, request, searchNow)
+            .WithTag(request.Tag)
+            .WithPeriod(request.PeriodDays, searchNow)
+            .WithSort(request.Sort)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize) // default is 10, maximum is 1000
+            .GetContentResultAsync();
+    }
+
+    private async Task<BlogFacetResults> FetchFacetsAsync(
+        BlogListPage blog, BlogSearchRequest request, DateTime searchNow)
+    {
+        var results = await client.MultiSearch<BlogPostFacetSearchHit>()
+            .Search<BlogPostPage, BlogPostFacetSearchHit>(q =>
+                BaseQuery(q, blog, request, searchNow)
+                    .WithPeriod(request.PeriodDays, searchNow)
+                    .TermsFacetFor(p => p.Tags, command => command.Size = Constants.TagFacetSize)
+                    .Take(0)
+                    .StaticallyCacheFor(CacheDuration)
+                    .Select(p => new BlogPostFacetSearchHit { Tags = p.Tags }))
+            .Search<BlogPostPage, BlogPostFacetSearchHit>(q =>
+                AddPeriodFacets(BaseQuery(q, blog, request, searchNow).WithTag(request.Tag), searchNow)
+                    .Take(0)
+                    .StaticallyCacheFor(CacheDuration)
+                    .Select(p => new BlogPostFacetSearchHit { Tags = p.Tags }))
+            .GetResultAsync();
+
+        var resultList = results.ToList();
+        return new BlogFacetResults(
+            BuildTagFacets(resultList[0], request.Tag),
+            BuildPeriodFacets(resultList[1], request.PeriodDays));
+    }
+
+    private static ITypeSearch<BlogPostPage> BaseQuery(ITypeSearch<BlogPostPage> query, BlogListPage blog,
+        BlogSearchRequest request, DateTime searchNow)
     {
         if (!string.IsNullOrWhiteSpace(request.Query))
         {
             query = query.For(request.Query)
-                .InFields(
-                    post => post.Title,
-                    post => post.Summary,
-                    post => post.GetSearchableMainBody())
-                .BoostMatching(post => post.GetAgeInDays().LessThan(91), 1000)
-                .BoostMatching(post => post.Tags.Match("optimizely"), 2000)
+                .InFields(p => p.Title, p => p.Summary, p => p.GetSearchableMainBody())
+                .BoostMatching(p => p.PublishDate.InRange(searchNow.AddDays(-90), searchNow), 1.5)
+                .BoostMatching(p => p.Tags.Match("optimizely"), 2)
                 .ApplyBestBets();
         }
-        
-        // Find requires For(...) before any filter. These CMS filters then keep every Blog List
-        // query within the site, language, visitor access and direct children of this Blog List.
-        query = query
-            .FilterOnCurrentSite()
+
+        query = query.FilterOnCurrentSite()
             .FilterForVisitor()
-            .Filter(post => post.ParentLink.ID.Match(blog.ContentLink.ID))
-            .Filter(post => post.PublishDate.InRange(DateTime.MinValue, DateTime.Now));
-
-        if (includeTag && request.Tag is not null)
-        {
-            query = query.Filter(post => post.Tags.Match(request.Tag));
-        }
-
-        if (includePeriod && request.PeriodDays.HasValue)
-        {
-            query = query
-                .Filter(post => post.PublishDate.InRange(DateTime.Now.AddDays(-request.PeriodDays.Value), DateTime.Now));
-        }
+            .Filter(p => p.ParentLink.ID.Match(blog.ContentLink.ID))
+            .Filter(p => p.PublishDate.Before(searchNow));
 
         if (request.QuickReadsOnly)
         {
-            query = query.Filter(post => post.GetReadingTimeMinutes().LessThan(4));
+            query = query.Filter(p => p.GetReadingTimeMinutes().LessThan(3));
         }
-
+        
         return query;
     }
 
-    private static ITypeSearch<BlogPostPage> AddPeriodFacets(ITypeSearch<BlogPostPage> query)
+    // Adds a facet filter for each period, so that the facet counts are correct when a tag is selected.
+    private static ITypeSearch<BlogPostPage> AddPeriodFacets(ITypeSearch<BlogPostPage> query, DateTime searchNow)
     {
         foreach (var period in Constants.Periods)
         {
-            var from = DateTime.Now.AddDays(-period.Days);
-            query = query.FilterFacet($"period-{period.Days}", post => post.PublishDate.InRange(from, DateTime.Now));
+            query = query.FilterFacet(PeriodFacetKey(period.Days), p =>
+                p.PublishDate.InRange(searchNow.AddDays(-period.Days), searchNow));
         }
-
         return query;
     }
 
-    private static IReadOnlyList<BlogSearchFacetOption> CreatePeriodFacets(
-        IContentResult<BlogPostPage> result,
-        int? selectedPeriodDays)
+    private static string PeriodFacetKey(int days) => $"period-{days}";
+
+    private BlogSearchViewModel MapToViewModel(
+        BlogListPage blog, BlogSearchRequest request, int page, int pageSize,
+        IContentResult<BlogPostPage> posts, BlogFacetResults facets)
     {
-        var facets = Constants.Periods
-            .Select(period => new BlogSearchFacetOption
+        var authorReferences = posts
+            .Select(post => post.AuthorRef)
+            .Where(author => !ContentReference.IsNullOrEmpty(author))
+            .Select(author => author!)
+            .ToList();
+        var authors = authorService.GetUrls(blog, authorReferences);
+
+        return new(blog)
+        {
+            Request = request,
+            TagFacets = facets.Tags,
+            PeriodFacets = facets.Periods,
+            Posts = posts.Select(post =>
             {
-                Value = period.Days.ToString(),
-                Label = period.Label,
-                Count = result.FilterFacet($"period-{period.Days}").Count,
-                IsSelected = selectedPeriodDays == period.Days
+                var author = post.AuthorRef is null ? null : authors.GetValueOrDefault(post.AuthorRef.ID);
+                return new BlogPostListItemViewModel(post, author?.Name, author?.Url);
+            }).ToList(),
+            Paging = new PagingViewModelBase
+            {
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = posts.TotalMatching
+            }
+        };
+    }
+
+    private static IReadOnlyList<BlogSearchFacetOption> BuildTagFacets(SearchResults<BlogPostFacetSearchHit> result, string? selectedTag)
+    {
+        return result
+            .TermsFacetFor(p => p.Tags).Terms
+            .OrderBy(facet => facet.Term)
+            .Select(facet =>
+            {
+                var isSelected = string.Equals(selectedTag, facet.Term, StringComparison.OrdinalIgnoreCase);
+                return new BlogSearchFacetOption(facet.Term, facet.Term, facet.Count, isSelected);
             })
             .ToList();
-
-        facets.Add(new BlogSearchFacetOption
-        {
-            Value = "all",
-            Label = "All time",
-            Count = result.TotalMatching,
-            IsSelected = !selectedPeriodDays.HasValue
-        });
-
-        return facets;
     }
+
+    private static IReadOnlyList<BlogSearchFacetOption> BuildPeriodFacets(
+        SearchResults<BlogPostFacetSearchHit> result,
+        int? selectedPeriodDays)
+    {
+        var options = Constants.Periods
+            .Select(period =>
+            {
+                var count = result.FilterFacet(PeriodFacetKey(period.Days)).Count;
+                var isSelected = selectedPeriodDays == period.Days;
+                return new BlogSearchFacetOption(period.Days.ToString(), period.Label, count, isSelected);
+
+            }).ToList();
+
+        options.Add(new BlogSearchFacetOption(Value: "all", Label: "All time", Count: result.TotalMatching, IsSelected: !selectedPeriodDays.HasValue));
+        return options;
+    }
+
+    private record BlogFacetResults(
+        IReadOnlyList<BlogSearchFacetOption> Tags,
+        IReadOnlyList<BlogSearchFacetOption> Periods);
 }
